@@ -1,7 +1,7 @@
 // psicologo.entity.ts
 import { Column, Entity, OneToMany, ManyToOne, JoinColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
-import { Persona } from "./persona.entity";
+import type { Persona } from "./persona.entity";
 import { Informe } from "./informe.entity";
 import { Sesion } from "./sesion.entity";
 
@@ -16,7 +16,7 @@ export class Psicologo extends BaseEntity {
   @Column({ name: "numero_licencia" })
   numeroLicencia: string;
 
-  @ManyToOne(() => Persona)
+  @OneToOne("Persona")
   @JoinColumn({ name: "persona_id" })
   persona: Persona;
 

@@ -11,7 +11,7 @@ import {
   Paciente,
   Sesion,
   Informe,
-  PerfilPermiso,
+  PerfilTienePermiso,
 } from "../entities"
 
 // Configuración para la conexión a la base de datos
@@ -30,7 +30,7 @@ export const AppDataSource = new DataSource({
     Persona,
     Permiso, 
     Perfil,
-    PerfilPermiso,
+    PerfilTienePermiso,
     Usuario,
     Psicologo,
     Paciente,

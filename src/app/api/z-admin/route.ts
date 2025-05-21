@@ -28,7 +28,6 @@ export async function GET() {
     adminUser.email = "admin@memopsy.com"; // Cambia por el email que prefieras
     adminUser.password = hashedPassword;
     adminUser.activo = true;
-    adminUser.esAdmin = true;
     adminUser.personaId = adminPersona.id;
     adminUser.ultimoAcceso = new Date();
 

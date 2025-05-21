@@ -3,9 +3,9 @@ import { Column, Entity, OneToMany } from "typeorm";
 import { BaseEntity } from "./base-entity";
 import { Domicilio } from "./domicilio.entity";
 import { Telefono } from "./telefono.entity";
-import { Usuario } from "./usuario.entity";
+import type { Usuario } from "./usuario.entity";
 import { PersonaTieneFactura } from "./persona-tiene-factura.entity";
-import { Paciente } from "./paciente.entity";
+import type { Paciente } from "./paciente.entity";
 
 @Entity({ name: "persona" })
 export class Persona extends BaseEntity {
@@ -27,12 +27,12 @@ export class Persona extends BaseEntity {
   @OneToMany(() => Telefono, telefono => telefono.persona)
   telefonos: Telefono[];
 
-  @OneToMany(() => Usuario, usuario => usuario.persona)
-  usuarios: Usuario[];
-
   @OneToMany(() => PersonaTieneFactura, personaTieneFactura => personaTieneFactura.persona)
   facturas: PersonaTieneFactura[];
 
-  @OneToMany(() => Paciente, paciente => paciente.persona)
-  pacientes: Paciente[];
+  @OneToOne("Usuario", "persona")
+  usuario: Usuario;
+
+  @OneToOne("Paciente", "persona")
+  paciente: Paciente;
 }
