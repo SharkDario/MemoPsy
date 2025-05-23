@@ -1,7 +1,7 @@
 // app/api/auth/[...nextauth]/route.ts
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { Usuario } from "@/entities"; // Ajusta la ruta a tus entidades
+import { UsuarioEntity } from "@/entities"; // Ajusta la ruta a tus entidades
 import { initializeDatabase } from '@/lib/database';
 // import { getDbConnection } from "@/lib/database"; // Necesitarás tu función de conexión a DB
 import bcrypt from 'bcrypt';
@@ -21,7 +21,7 @@ export const authOptions = {
         }
 
         const db = await initializeDatabase(); // Obtén conexión DB
-        const userRepository = db.getRepository(Usuario);
+        const userRepository = db.getRepository(UsuarioEntity);
 
         try {
           const user = await userRepository.findOne({ where: { email: credentials.email } });
@@ -40,7 +40,6 @@ export const authOptions = {
                 email: user.email,
                 personaId: user.personaId, 
                 perfilId: user.perfilId,
-                esAdmin: user.esAdmin,
                 activo: user.activo,
                 };
             } else {
@@ -73,7 +72,6 @@ export const authOptions = {
               token.email = user.email;
               token.personaId = user.personaId;
               token.perfilId = user.perfilId;
-              token.esAdmin = user.esAdmin;
               token.activo = user.activo;
           }
           return token;
@@ -85,7 +83,6 @@ export const authOptions = {
             session.user.email = token.email;
             session.user.personaId = token.personaId;
             session.user.perfilId = token.perfilId;
-            session.user.esAdmin = token.esAdmin;
             session.user.activo = token.activo;
           }
           return session;

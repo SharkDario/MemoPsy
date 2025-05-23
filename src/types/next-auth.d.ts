@@ -5,7 +5,6 @@ declare module "next-auth" {
     id: string
     email: string
     name?: string
-    esAdmin: boolean
     perfilId?: string
     tipo?: string
   }
@@ -19,7 +18,6 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string
     email: string
-    esAdmin: boolean
     perfilId?: string
     tipo?: string
   }
