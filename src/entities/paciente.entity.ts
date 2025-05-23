@@ -1,30 +1,30 @@
 // paciente.entity.ts
-import { Column, Entity, ManyToOne, JoinColumn, OneToMany } from "typeorm";
+import { Entity, ManyToOne, JoinColumn, OneToMany, OneToOne } from "typeorm";
 import { BaseEntity } from "./base-entity";
-import type { Persona } from "./persona.entity";
-import { ObraSocial } from "./obra-social.entity";
-import { PacienteTieneInforme } from "./paciente-tiene-informe.entity";
-import { PacienteTieneSesion } from "./paciente-tiene-sesion.entity";
+import type { PersonaEntity } from "./persona.entity";
+import { ObraSocialEntity } from "./obra-social.entity";
 
 @Entity({ name: "paciente" })
-export class Paciente extends BaseEntity {
-  @Column({ name: "persona_id" })
-  personaId: string;
-
-  @Column({ name: "obra_social_id" })
-  obraSocialId: string;
-
-  @OneToOne("Persona")
+export class PacienteEntity extends BaseEntity {
+  @OneToOne("PersonaEntity")
   @JoinColumn({ name: "persona_id" })
-  persona: Persona;
+  persona: PersonaEntity;
 
-  @ManyToOne(() => ObraSocial)
+  @ManyToOne(() => ObraSocialEntity)
   @JoinColumn({ name: "obra_social_id" })
-  obraSocial: ObraSocial;
+  obraSocial: ObraSocialEntity;
 
-  @OneToMany(() => PacienteTieneInforme, pacienteTieneInforme => pacienteTieneInforme.paciente)
-  informes: PacienteTieneInforme[];
+  /*
+  @OneToMany(() => PacienteTieneInformeEntity, pacienteTieneInforme => pacienteTieneInforme.paciente)
+  informes: PacienteTieneInformeEntity[];
 
-  @OneToMany(() => PacienteTieneSesion, pacienteTieneSesion => pacienteTieneSesion.paciente)
-  sesiones: PacienteTieneSesion[];
+  @OneToMany(() => PacienteTieneSesionEntity, pacienteTieneSesion => pacienteTieneSesion.paciente)
+  sesiones: PacienteTieneSesionEntity[];
+  */
 }
+
+//@Column({ name: "persona_id" })
+  //personaId: string;
+
+  //@Column({ name: "obra_social_id" })
+  //obraSocialId: string;

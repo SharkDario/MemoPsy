@@ -1,22 +1,21 @@
 // persona-tiene-factura.entity.ts
-import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
-import { BaseEntity } from "./base-entity";
-import { Persona } from "./persona.entity";
-import { Factura } from "./factura.entity";
+import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from "typeorm";
+import { PersonaEntity } from "./persona.entity";
+import { FacturaEntity } from "./factura.entity";
 
 @Entity({ name: "persona_tiene_factura" })
-export class PersonaTieneFactura extends BaseEntity {
-  @Column({ name: "persona_id" })
+export class PersonaTieneFacturaEntity {
+  @PrimaryColumn({ name: "persona_id" })
   personaId: string;
-
-  @Column({ name: "factura_id" })
+     
+  @PrimaryColumn({ name: "factura_id" })
   facturaId: string;
 
-  @ManyToOne(() => Persona)
+  @ManyToOne(() => PersonaEntity)
   @JoinColumn({ name: "persona_id" })
-  persona: Persona;
+  persona: PersonaEntity;
 
-  @ManyToOne(() => Factura)
+  @ManyToOne(() => FacturaEntity)
   @JoinColumn({ name: "factura_id" })
-  factura: Factura;
+  factura: FacturaEntity;
 }

@@ -1,13 +1,13 @@
 // domicilio.entity.ts
 import { Column, Entity, ManyToOne, JoinColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
-import { Persona } from "./persona.entity";
-import { Ciudad } from "./ciudad.entity";
+import { PersonaEntity } from "./persona.entity";
+import { CiudadEntity } from "./ciudad.entity";
 
 @Entity({ name: "domicilio" })
-export class Domicilio extends BaseEntity {
-  @Column({ name: "persona_id" })
-  personaId: string;
+export class DomicilioEntity extends BaseEntity {
+  //@Column({ name: "persona_id" })
+  //personaId: string;
 
   @Column({ name: "numero" })
   numero: string;
@@ -18,14 +18,14 @@ export class Domicilio extends BaseEntity {
   @Column({ name: "calle" })
   calle: string;
 
-  @Column({ name: "ciudad_id" })
-  ciudadId: string;
+  //@Column({ name: "ciudad_id" })
+  //ciudadId: string;
 
-  @ManyToOne(() => Persona)
+  @ManyToOne(() => PersonaEntity)
   @JoinColumn({ name: "persona_id" })
-  persona: Persona;
+  persona: PersonaEntity;
 
-  @ManyToOne(() => Ciudad)
+  @ManyToOne(() => CiudadEntity)
   @JoinColumn({ name: "ciudad_id" })
-  ciudad: Ciudad;
+  ciudad: CiudadEntity;
 }

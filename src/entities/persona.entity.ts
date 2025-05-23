@@ -1,14 +1,9 @@
 // persona.entity.ts
-import { Column, Entity, OneToMany } from "typeorm";
+import { Column, Entity } from "typeorm";
 import { BaseEntity } from "./base-entity";
-import { Domicilio } from "./domicilio.entity";
-import { Telefono } from "./telefono.entity";
-import type { Usuario } from "./usuario.entity";
-import { PersonaTieneFactura } from "./persona-tiene-factura.entity";
-import type { Paciente } from "./paciente.entity";
 
 @Entity({ name: "persona" })
-export class Persona extends BaseEntity {
+export class PersonaEntity extends BaseEntity {
   @Column({ name: "nombre" })
   nombre: string;
 
@@ -20,19 +15,4 @@ export class Persona extends BaseEntity {
 
   @Column({ name: "fecha_nacimiento", type: "date" })
   fechaNacimiento: Date;
-
-  @OneToMany(() => Domicilio, domicilio => domicilio.persona)
-  domicilios: Domicilio[];
-
-  @OneToMany(() => Telefono, telefono => telefono.persona)
-  telefonos: Telefono[];
-
-  @OneToMany(() => PersonaTieneFactura, personaTieneFactura => personaTieneFactura.persona)
-  facturas: PersonaTieneFactura[];
-
-  @OneToOne("Usuario", "persona")
-  usuario: Usuario;
-
-  @OneToOne("Paciente", "persona")
-  paciente: Paciente;
 }

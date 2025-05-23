@@ -1,14 +1,12 @@
 // psicologo.entity.ts
-import { Column, Entity, OneToMany, ManyToOne, JoinColumn } from "typeorm";
+import { Column, Entity, OneToMany, OneToOne, JoinColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
-import type { Persona } from "./persona.entity";
-import { Informe } from "./informe.entity";
-import { Sesion } from "./sesion.entity";
+import type { PersonaEntity } from "./persona.entity";
 
 @Entity({ name: "psicologo" })
-export class Psicologo extends BaseEntity {
-  @Column({ name: "persona_id" })
-  personaId: string;
+export class PsicologoEntity extends BaseEntity {
+  //@Column({ name: "persona_id" })
+  //personaId: string;
 
   @Column({ name: "especialidad" })
   especialidad: string;
@@ -16,13 +14,15 @@ export class Psicologo extends BaseEntity {
   @Column({ name: "numero_licencia" })
   numeroLicencia: string;
 
-  @OneToOne("Persona")
+  @OneToOne("PersonaEntity")
   @JoinColumn({ name: "persona_id" })
-  persona: Persona;
+  persona: PersonaEntity;
 
-  @OneToMany(() => Informe, informe => informe.psicologo)
-  informes: Informe[];
+  /*
+  @OneToMany(() => InformeEntity, informe => informe.psicologo)
+  informes: InformeEntity[];
 
-  @OneToMany(() => Sesion, sesion => sesion.psicologo)
-  sesiones: Sesion[];
+  @OneToMany(() => SesionEntity, sesion => sesion.psicologo)
+  sesiones: SesionEntity[];
+  */
 }

@@ -1,36 +1,36 @@
 // factura.entity.ts
 import { Column, Entity, ManyToOne, JoinColumn, OneToMany } from "typeorm";
 import { BaseEntity } from "./base-entity";
-import { TipoFactura } from "./tipo-factura.entity";
-import { MedioDePago } from "./medio-de-pago.entity";
-import { DetalleFactura } from "./detalle-factura.entity";
-import { PersonaTieneFactura } from "./persona-tiene-factura.entity";
+import { TipoFacturaEntity } from "./tipo-factura.entity";
+import { MedioDePagoEntity } from "./medio-de-pago.entity";
 
 @Entity({ name: "factura" })
-export class Factura extends BaseEntity {
+export class FacturaEntity extends BaseEntity {
   @Column({ name: "numero" })
   numero: string;
 
   @Column({ name: "fecha_emision", type: "date" })
   fechaEmision: Date;
 
-  @Column({ name: "tipo_factura_id" })
-  tipoFacturaId: string;
+  //@Column({ name: "tipo_factura_id" })
+  //tipoFacturaId: string;
 
-  @Column({ name: "medio_de_pago_id" })
-  medioDePagoId: string;
+  //@Column({ name: "medio_de_pago_id" })
+  //medioDePagoId: string;
 
-  @ManyToOne(() => TipoFactura)
+  @ManyToOne(() => TipoFacturaEntity)
   @JoinColumn({ name: "tipo_factura_id" })
-  tipoFactura: TipoFactura;
+  tipoFactura: TipoFacturaEntity;
 
-  @ManyToOne(() => MedioDePago)
+  @ManyToOne(() => MedioDePagoEntity)
   @JoinColumn({ name: "medio_de_pago_id" })
-  medioDePago: MedioDePago;
+  medioDePago: MedioDePagoEntity;
 
-  @OneToMany(() => DetalleFactura, detalleFactura => detalleFactura.factura)
-  detalles: DetalleFactura[];
+  /*
+  @OneToMany(() => DetalleFacturaEntity, detalleFactura => detalleFactura.factura)
+  detalles: DetalleFacturaEntity[];
 
-  @OneToMany(() => PersonaTieneFactura, personaTieneFactura => personaTieneFactura.factura)
-  personas: PersonaTieneFactura[];
+  @OneToMany(() => PersonaTieneFacturaEntity, personaTieneFactura => personaTieneFactura.factura)
+  personas: PersonaTieneFacturaEntity[];
+  */
 }

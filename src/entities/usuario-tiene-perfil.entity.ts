@@ -1,22 +1,21 @@
 // usuario-tiene-perfil.entity.ts
-import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
-import { BaseEntity } from "./base-entity";
-import { Usuario } from "./usuario.entity";
-import { Perfil } from "./perfil.entity";
+import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from "typeorm";
+import { UsuarioEntity } from "./usuario.entity";
+import { PerfilEntity } from "./perfil.entity";
 
 @Entity({ name: "usuario_tiene_perfil" })
-export class UsuarioTienePerfil extends BaseEntity {
-  @Column({ name: "usuario_id" })
+export class UsuarioTienePerfilEntity {
+  @PrimaryColumn({ name: "usuario_id" })
   usuarioId: string;
 
-  @Column({ name: "perfil_id" })
+  @PrimaryColumn({ name: "perfil_id" })
   perfilId: string;
 
-  @ManyToOne(() => Usuario)
+  @ManyToOne(() => UsuarioEntity)
   @JoinColumn({ name: "usuario_id" })
-  usuario: Usuario;
+  usuario: UsuarioEntity;
 
-  @ManyToOne(() => Perfil)
+  @ManyToOne(() => PerfilEntity)
   @JoinColumn({ name: "perfil_id" })
-  perfil: Perfil;
+  perfil: PerfilEntity;
 }

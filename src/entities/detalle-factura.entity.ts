@@ -1,25 +1,25 @@
 // detalle-factura.entity
 import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
-import { Sesion } from "./sesion.entity";
-import { Factura } from "./factura.entity";
+import { SesionEntity } from "./sesion.entity";
+import { FacturaEntity } from "./factura.entity";
 
 @Entity({ name: "detalle_factura" })
-export class DetalleFactura extends BaseEntity {
+export class DetalleFacturaEntity extends BaseEntity {
   @Column({ name: "precio", type: "decimal", precision: 10, scale: 2 })
   precio: number;
 
-  @Column({ name: "sesion_id" })
-  sesionId: string;
+  //@Column({ name: "sesion_id" })
+  //sesionId: string;
 
-  @Column({ name: "factura_id" })
-  facturaId: string;
+  //@Column({ name: "factura_id" })
+  //facturaId: string;
 
-  @ManyToOne(() => Sesion)
+  @ManyToOne(() => SesionEntity)
   @JoinColumn({ name: "sesion_id" })
-  sesion: Sesion;
+  sesion: SesionEntity;
 
-  @ManyToOne(() => Factura)
+  @ManyToOne(() => FacturaEntity)
   @JoinColumn({ name: "factura_id" })
-  factura: Factura;
+  factura: FacturaEntity;
 }

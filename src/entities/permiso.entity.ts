@@ -1,32 +1,22 @@
 // permiso.entity.ts
 import { Column, Entity, ManyToOne, JoinColumn, OneToMany } from "typeorm";
 import { BaseEntity } from "./base-entity";
-import { Modulo } from "./modulo.entity";
-import { Accion } from "./accion.entity";
-import { PerfilTienePermiso } from "./perfil-tiene-permiso.entity";
+import { ModuloEntity } from "./modulo.entity";
+import { AccionEntity } from "./accion.entity";
 
 @Entity({ name: "permiso" })
-export class Permiso extends BaseEntity {
+export class PermisoEntity extends BaseEntity {
   @Column({ name: "nombre" })
   nombre: string;
 
   @Column({ name: "descripcion" })
   descripcion: string;
 
-  @Column({ name: "modulo_id" })
-  moduloId: string;
-
-  @Column({ name: "accion_id" })
-  accionId: string;
-
-  @ManyToOne(() => Modulo)
+  @ManyToOne(() => ModuloEntity)
   @JoinColumn({ name: "modulo_id" })
-  modulo: Modulo;
+  modulo: ModuloEntity;
 
-  @ManyToOne(() => Accion)
+  @ManyToOne(() => AccionEntity)
   @JoinColumn({ name: "accion_id" })
-  accion: Accion;
-
-  @OneToMany(() => PerfilTienePermiso, perfilTienePermiso => perfilTienePermiso.permiso)
-  perfiles: PerfilTienePermiso[];
+  accion: AccionEntity;
 }

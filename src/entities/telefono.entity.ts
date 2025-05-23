@@ -1,17 +1,14 @@
 // telefono.entity.ts
 import { Column, Entity, ManyToOne, JoinColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
-import { Persona } from "./persona.entity";
+import { PersonaEntity } from "./persona.entity";
 
 @Entity({ name: "telefono" })
-export class Telefono extends BaseEntity {
-  @Column({ name: "persona_id" })
-  personaId: string;
-
+export class TelefonoEntity extends BaseEntity {
   @Column({ name: "numero" })
   numero: string;
 
-  @ManyToOne(() => Persona)
+  @ManyToOne(() => PersonaEntity)
   @JoinColumn({ name: "persona_id" })
-  persona: Persona;
+  persona: PersonaEntity;
 }

@@ -1,22 +1,21 @@
 // perfil-tiene-permiso.entity.ts
-import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
-import { BaseEntity } from "./base-entity";
-import { Perfil } from "./perfil.entity";
-import { Permiso } from "./permiso.entity";
+import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from "typeorm";
+import { PerfilEntity } from "./perfil.entity";
+import { PermisoEntity } from "./permiso.entity";
 
 @Entity({ name: "perfil_tiene_permiso" })
-export class PerfilTienePermiso extends BaseEntity {
-  @Column({ name: "perfil_id" })
+export class PerfilTienePermisoEntity {
+  @PrimaryColumn({ name: "perfil_id" })
   perfilId: string;
-
-  @Column({ name: "permiso_id" })
+    
+  @PrimaryColumn({ name: "permiso_id" })
   permisoId: string;
 
-  @ManyToOne(() => Perfil)
+  @ManyToOne(() => PerfilEntity)
   @JoinColumn({ name: "perfil_id" })
-  perfil: Perfil;
+  perfil: PerfilEntity;
 
-  @ManyToOne(() => Permiso)
+  @ManyToOne(() => PermisoEntity)
   @JoinColumn({ name: "permiso_id" })
-  permiso: Permiso;
+  permiso: PermisoEntity;
 }

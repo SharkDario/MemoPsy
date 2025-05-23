@@ -1,22 +1,21 @@
 // paciente-tiene-informe.entity.ts
-import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
-import { BaseEntity } from "./base-entity";
-import { Informe } from "./informe.entity";
-import { Paciente } from "./paciente.entity";
+import { Entity, ManyToOne, JoinColumn, PrimaryColumn } from "typeorm";
+import { InformeEntity } from "./informe.entity";
+import { PacienteEntity } from "./paciente.entity";
 
 @Entity({ name: "paciente_tiene_informe" })
-export class PacienteTieneInforme extends BaseEntity {
-  @Column({ name: "informe_id" })
+export class PacienteTieneInformeEntity {
+  @PrimaryColumn({ name: "informe_id" })
   informeId: string;
 
-  @Column({ name: "paciente_id" })
+  @PrimaryColumn({ name: "paciente_id" })
   pacienteId: string;
 
-  @ManyToOne(() => Informe)
+  @ManyToOne(() => InformeEntity)
   @JoinColumn({ name: "informe_id" })
-  informe: Informe;
+  informe: InformeEntity;
 
-  @ManyToOne(() => Paciente)
+  @ManyToOne(() => PacienteEntity)
   @JoinColumn({ name: "paciente_id" })
-  paciente: Paciente;
+  paciente: PacienteEntity;
 }

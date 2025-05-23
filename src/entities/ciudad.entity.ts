@@ -1,21 +1,20 @@
 // ciudad.entity.ts
 import { Column, Entity, OneToMany, ManyToOne, JoinColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
-import { Pais } from "./pais.entity";
-import { Domicilio } from "./domicilio.entity";
+import { PaisEntity } from "./pais.entity";
 
 @Entity({ name: "ciudad" })
-export class Ciudad extends BaseEntity {
+export class CiudadEntity extends BaseEntity {
   @Column({ name: "nombre" })
   nombre: string;
 
-  @Column({ name: "pais_id" })
-  paisId: string;
+  //@Column({ name: "pais_id" })
+  //paisId: string;
 
-  @ManyToOne(() => Pais)
+  @ManyToOne(() => PaisEntity)
   @JoinColumn({ name: "pais_id" })
-  pais: Pais;
+  pais: PaisEntity;
 
-  @OneToMany(() => Domicilio, domicilio => domicilio.ciudad)
-  domicilios: Domicilio[];
+  //@OneToMany(() => DomicilioEntity, domicilio => domicilio.ciudad)
+  //domicilios: DomicilioEntity[];
 }

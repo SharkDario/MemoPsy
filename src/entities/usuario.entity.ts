@@ -1,14 +1,10 @@
 // usuario.entity.ts
-import { Column, Entity, ManyToOne, JoinColumn, OneToMany } from "typeorm";
+import { Column, Entity, OneToOne, JoinColumn, OneToMany } from "typeorm";
 import { BaseEntity } from "./base-entity";
-import type { Persona } from "./persona.entity";
-import { UsuarioTienePerfil } from "./usuario-tiene-perfil.entity";
+import type { PersonaEntity } from "./persona.entity";
 
 @Entity({ name: "usuario" })
-export class Usuario extends BaseEntity {
-  @Column({ name: "persona_id" })
-  personaId: string;
-
+export class UsuarioEntity extends BaseEntity {
   @Column({ name: "email" })
   email: string;
 
@@ -21,10 +17,7 @@ export class Usuario extends BaseEntity {
   @Column({ name: "ultimo_acceso", type: "datetime" })
   ultimoAcceso: Date;
 
-  @OneToOne("Persona")
+  @OneToOne("PersonaEntity")
   @JoinColumn({ name: "persona_id" })
-  persona: Persona;
-
-  @OneToMany(() => UsuarioTienePerfil, usuarioTienePerfil => usuarioTienePerfil.usuario)
-  perfiles: UsuarioTienePerfil[];
+  persona: PersonaEntity;
 }

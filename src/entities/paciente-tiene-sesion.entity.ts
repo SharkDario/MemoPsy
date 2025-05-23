@@ -1,22 +1,21 @@
 // paciente-tiene-sesion.entity.ts
-import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
-import { BaseEntity } from "./base-entity";
-import { Sesion } from "./sesion.entity";
-import { Paciente } from "./paciente.entity";
+import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from "typeorm";
+import { SesionEntity } from "./sesion.entity";
+import { PacienteEntity } from "./paciente.entity";
 
 @Entity({ name: "paciente_tiene_sesion" })
-export class PacienteTieneSesion extends BaseEntity {
-  @Column({ name: "sesion_id" })
+export class PacienteTieneSesionEntity {
+  @PrimaryColumn({ name: "sesion_id" })
   sesionId: string;
-
-  @Column({ name: "paciente_id" })
+  
+  @PrimaryColumn({ name: "paciente_id" })
   pacienteId: string;
 
-  @ManyToOne(() => Sesion)
+  @ManyToOne(() => SesionEntity)
   @JoinColumn({ name: "sesion_id" })
-  sesion: Sesion;
+  sesion: SesionEntity;
 
-  @ManyToOne(() => Paciente)
+  @ManyToOne(() => PacienteEntity)
   @JoinColumn({ name: "paciente_id" })
-  paciente: Paciente;
+  paciente: PacienteEntity;
 }
