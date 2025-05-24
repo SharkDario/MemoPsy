@@ -1,5 +1,4 @@
 // paciente-tiene-informe.model.ts
-import { Base } from "./base-model";
 import { Paciente } from "./paciente.model";
 import { Informe } from "./informe.model";
 import { PacienteTieneInformeEntity } from "../entities/paciente-tiene-informe.entity";

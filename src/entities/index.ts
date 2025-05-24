@@ -1,3 +1,7 @@
+// index.ts for entities
+// Este archivo sirve como punto de entrada para exportar todas las entidades de la aplicación.
+// Esto permite importar todas las entidades desde un solo lugar, facilitando su uso en otras partes de la aplicación.
+// También se puede utilizar para inicializar la conexión a la base de datos y cargar las entidades necesarias.
 export * from "./base-entity"
 export * from "./accion.entity"
 export * from "./ciudad.entity"

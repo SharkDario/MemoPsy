@@ -1,3 +1,6 @@
+//index.ts for models
+// Este archivo sirve como punto de entrada para exportar todos los modelos de la aplicación.
+// Esto permite importar todos los modelos desde un solo lugar, facilitando su uso en otras partes de la aplicación.
 export * from "./base-model"
 export * from "./accion.model"
 export * from "./ciudad.model"

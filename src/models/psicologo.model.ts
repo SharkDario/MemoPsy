@@ -42,10 +42,12 @@ export class Psicologo extends Base {
     }
     
     get persona(): Persona | undefined { return this._persona; }
-    // Métodos de dominio
-    //private validarFormatoLicencia(licencia: string): boolean {
-    //  return /^[A-Z]{2}-\d{6}$/.test(licencia);
-    //}
+    set persona(value: Persona | undefined) {
+      if (value && !(value instanceof Persona)) {
+        throw new Error('El valor debe ser una instancia de Persona');
+      }
+      this._persona = value;
+    }
 
     // Sobrescribimos el método info de la clase Base (polimorfismo)
     override get info(): string {
@@ -65,7 +67,7 @@ export class Psicologo extends Base {
         id: entity.id,
         especialidad: entity.especialidad,
         numeroLicencia: entity.numeroLicencia,
-        persona: entity.persona,
+        persona: Persona.fromEntity(entity.persona)
       });
     }
     
