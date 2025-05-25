@@ -1,7 +1,7 @@
 // /app/api/profile/usuarios/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { AppDataSource } from '@/lib/database';
-import { Usuario, Persona, Perfil } from '@/entities';
+import { UsuarioEntity, PersonaEntity, PerfilEntity } from '@/entities/index';
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
       await AppDataSource.initialize();
     }
 
-    const usuarioRepository = AppDataSource.getRepository(Usuario);
+    const usuarioRepository = AppDataSource.getRepository(UsuarioEntity);
 
     // Obtener todos los usuarios con relaciones directamente
     const usuarios = await usuarioRepository.find({
@@ -22,7 +22,6 @@ export async function GET(request: NextRequest) {
       id: usuario.id,
       email: usuario.email,
       activo: usuario.activo,
-      esAdmin: usuario.esAdmin,
       persona: usuario.persona
         ? {
             nombre: usuario.persona.nombre,
