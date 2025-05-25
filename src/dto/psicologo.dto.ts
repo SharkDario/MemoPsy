@@ -50,16 +50,16 @@ export class PsicologoResponseDto {
   numeroLicencia: string;
   persona?: PersonaResponseDto;
   
-  constructor(
+  constructor(data: {
     id: string,
     especialidad: string,
     numeroLicencia: string,
     persona?: PersonaResponseDto,
-  ) {
-    this.id = id;
-    this.especialidad = especialidad;
-    this.numeroLicencia = numeroLicencia;
-    this.persona = persona;
+  }) {
+    this.id = data.id;
+    this.especialidad = data.especialidad;
+    this.numeroLicencia = data.numeroLicencia;
+    this.persona = data.persona;
   }
 
   //constructor(partial: Partial<PsicologoResponseDto>) {

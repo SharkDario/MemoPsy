@@ -1,4 +1,5 @@
 // services/psicologo.service.ts
+import { PsicologoEntity } from '@/entities';
 import { PsicologoRepository } from '../repositories/psicologo.repository';
 import { PersonaRepository } from '../repositories/persona.repository'; // Asumiendo que existe
 import { Psicologo } from '../models/psicologo.model';
@@ -242,22 +243,21 @@ export class PsicologoService {
     return psicologos.map(entity => this.mapToResponseDto(entity));
   }
 
-  // Mapear entidad a DTO de respuesta
-  public mapToResponseDto(entity: any): PsicologoResponseDto {
-    return new PsicologoResponseDto({
-      id: entity.id,
-      especialidad: entity.especialidad,
-      numeroLicencia: entity.numeroLicencia,
-      persona: entity.persona ? new PersonaResponseDto({
-        id: entity.persona.id,
-        nombre: entity.persona.nombre,
-        apellido: entity.persona.apellido,
-        dni: entity.persona.dni,
-        fechaNacimiento: entity.persona.fechaNacimiento,
-      }) : undefined,
-      //createdAt: entity.createdAt,
-      //updatedAt: entity.updatedAt
-    });
+  public mapToResponseDto(psicologo: PsicologoEntity): PsicologoResponseDto {
+      const personaDto = new PersonaResponseDto({
+        id: psicologo.persona.id,
+        nombre: psicologo.persona.nombre,
+        apellido: psicologo.persona.apellido,
+        dni: psicologo.persona.dni,
+        fechaNacimiento: psicologo.persona.fechaNacimiento,
+      });
+  
+      return new PsicologoResponseDto({
+        id: psicologo.id,
+        especialidad: psicologo.especialidad,
+        numeroLicencia: psicologo.numeroLicencia,
+        persona: personaDto,
+      });
   }
 
   // Validar si un psicólogo puede ser eliminado (verificar dependencias)

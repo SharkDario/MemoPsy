@@ -167,6 +167,14 @@ export class PacienteService {
     return this.mapToResponseDto(updatedPaciente);
   }
 
+  async findByPersonaId(personaId: string): Promise<PacienteResponseDto | null> {
+    const paciente = await this.pacienteRepository.findByPersonaId(personaId);
+    if (!paciente) {
+      return null;
+    }
+    return this.mapToResponseDto(paciente);
+  }
+
   // Eliminar un paciente
   async deletePaciente(id: string): Promise<boolean> {
     const existingPaciente = await this.pacienteRepository.findById(id);
