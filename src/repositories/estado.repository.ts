@@ -1,5 +1,5 @@
 // repositories/estado.repository.ts
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { EstadoEntity } from '../entities/estado.entity';
 import { Estado } from '../models/estado.model';
 import { CreateEstadoDto, UpdateEstadoDto } from '../dto/estado.dto';
@@ -16,7 +16,10 @@ export interface IEstadoRepository {
 }
 
 export class EstadoRepository implements IEstadoRepository {
-  constructor(private readonly repository: Repository<EstadoEntity>) {}
+  private readonly repository: Repository<EstadoEntity>;
+  constructor(dataSource: DataSource) {
+    this.repository = dataSource.getRepository(EstadoEntity)
+  }
 
   async findAll(): Promise<Estado[]> {
     try {
@@ -113,7 +116,7 @@ export class EstadoRepository implements IEstadoRepository {
   async delete(id: string): Promise<boolean> {
     try {
       const result = await this.repository.delete(id);
-      return result.affected !== null && result.affected > 0;
+      return (result.affected ?? 0) > 0;
     } catch (error) {
       throw new Error(`Error al eliminar estado: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }

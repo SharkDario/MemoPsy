@@ -1,5 +1,5 @@
 // repositories/modalidad.repository.ts
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { ModalidadEntity } from '../entities/modalidad.entity';
 import { Modalidad } from '../models/modalidad.model';
 import { CreateModalidadDto, UpdateModalidadDto } from '../dto/modalidad.dto';
@@ -16,8 +16,11 @@ export interface IModalidadRepository {
 }
 
 export class ModalidadRepository implements IModalidadRepository {
-  constructor(private readonly repository: Repository<ModalidadEntity>) {}
-
+  private readonly repository: Repository<ModalidadEntity>;
+  constructor(dataSource: DataSource) {
+    this.repository = dataSource.getRepository(ModalidadEntity)
+  }
+  
   async findAll(): Promise<Modalidad[]> {
     try {
       const entities = await this.repository.find({
