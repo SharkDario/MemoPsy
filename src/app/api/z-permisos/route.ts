@@ -1,14 +1,281 @@
 import { NextResponse } from "next/server";
 import { AppDataSource } from '@/lib/database';
-import { Permiso, Modulo, Accion } from "@/entities";
+import { PermisoEntity, ModuloEntity, AccionEntity, PerfilEntity, PerfilTienePermisoEntity } from "@/entities";
 
 export async function GET() {
   try {
-    await AppDataSource.initialize();
-    const permisoRepository = AppDataSource.getRepository(Permiso);
-    const moduloRepository = AppDataSource.getRepository(Modulo);
-    const accionRepository = AppDataSource.getRepository(Accion);
+    if (!AppDataSource.isInitialized) {
+      await AppDataSource.initialize();
+    }
+    const perfilRepository = AppDataSource.getRepository(PerfilEntity);
+    const perfilTienePermisoRepository = AppDataSource.getRepository(PerfilTienePermisoEntity);
+    const permisoRepository = AppDataSource.getRepository(PermisoEntity);
+    const moduloRepository = AppDataSource.getRepository(ModuloEntity);
+    const accionRepository = AppDataSource.getRepository(AccionEntity);
+
+    let perfilAdmin = new PerfilEntity();
+    perfilAdmin.nombre = "Administrador";
+    perfilAdmin.descripcion = "Administrador con todos los permisos"
+    await perfilRepository.save(perfilAdmin);
+
+    let moduloInformes = new ModuloEntity();
+    moduloInformes.nombre = 'Informes';
+    await moduloRepository.save(moduloInformes);
+    let moduloSesiones = new ModuloEntity();
+    moduloSesiones.nombre = 'Sesiones';
+    await moduloRepository.save(moduloSesiones);
+    let moduloPerfiles = new ModuloEntity();
+    moduloPerfiles.nombre = 'Perfiles';
+    await moduloRepository.save(moduloPerfiles);
+    let moduloUsuarios = new ModuloEntity();
+    moduloUsuarios.nombre = 'Usuarios';
+    await moduloRepository.save(moduloUsuarios);
+    let accionRegistrar = new AccionEntity();
+    accionRegistrar.nombre = 'Registrar';
+    await accionRepository.save(accionRegistrar);
+    let accionVer = new AccionEntity();
+    accionVer.nombre = 'Ver';
+    await accionRepository.save(accionVer);
+    let accionEditar = new AccionEntity();
+    accionEditar.nombre = 'Editar';
+    await accionRepository.save(accionEditar);
+    let accionEliminar = new AccionEntity();
+    accionEliminar.nombre = 'Eliminar';
+    await accionRepository.save(accionEliminar);
+    let accionAsignar = new AccionEntity();
+    accionAsignar.nombre = 'Asignar';
+    await accionRepository.save(accionAsignar);
+
+    moduloUsuarios = await moduloRepository.findOne({where: { nombre: 'Usuarios' }});
+    moduloInformes = await moduloRepository.findOne({where: { nombre: 'Informes' }});
+    moduloSesiones = await moduloRepository.findOne({where: { nombre: 'Sesiones' }});
+    accionRegistrar = await accionRepository.findOne({where: { nombre: 'Registrar' }});
+    accionVer = await accionRepository.findOne({where: { nombre: 'Ver' }});
+    accionEditar = await accionRepository.findOne({where: { nombre: 'Editar' }});
+    accionEliminar = await accionRepository.findOne({where: { nombre: 'Eliminar' }});
+    accionAsignar = await accionRepository.findOne({where: { nombre: 'Asignar' }});
+    perfilAdmin = await perfilRepository.findOne({where: {nombre: 'Administrador'}})
+
+    let permiso = new PermisoEntity();
+    let perfilTienePermiso = new PerfilTienePermisoEntity();
+    permiso.nombre = 'Registrar Perfil';
+    permiso.descripcion = 'Registrar un nuevo perfil';
+    permiso.modulo = moduloPerfiles;
+    permiso.accion = accionRegistrar;
+    permiso = await permisoRepository.save(permiso);
+    perfilTienePermiso.perfil = perfilAdmin;
+    perfilTienePermiso.permiso = permiso;
+    perfilTienePermiso.perfilId = perfilAdmin.id;
+    perfilTienePermiso.permisoId = permiso.id;
+    await perfilTienePermisoRepository.save(perfilTienePermiso);
+
+    permiso = new PermisoEntity();
+    permiso.nombre = 'Eliminar Perfil';
+    permiso.descripcion = 'Eliminar un perfil';
+    permiso.modulo = moduloPerfiles;
+    permiso.accion = accionEliminar;
+    permiso = await permisoRepository.save(permiso);
+    perfilTienePermiso.perfil = perfilAdmin;
+    perfilTienePermiso.permiso = permiso;
+    perfilTienePermiso.perfilId = perfilAdmin.id;
+    perfilTienePermiso.permisoId = permiso.id;
+    await perfilTienePermisoRepository.save(perfilTienePermiso);
+
+    permiso = new PermisoEntity();
+    permiso.nombre = 'Editar Perfil';
+    permiso.descripcion = 'Editar un perfil';
+    permiso.modulo = moduloPerfiles;
+    permiso.accion = accionEditar;
+    permiso = await permisoRepository.save(permiso);
+    perfilTienePermiso.perfil = perfilAdmin;
+    perfilTienePermiso.permiso = permiso;
+    perfilTienePermiso.perfilId = perfilAdmin.id;
+    perfilTienePermiso.permisoId = permiso.id;
+    await perfilTienePermisoRepository.save(perfilTienePermiso);
+
+    permiso = new PermisoEntity();
+    permiso.nombre = 'Ver Perfiles';
+    permiso.descripcion = 'Ver la lista de perfiles';
+    permiso.modulo = moduloPerfiles;
+    permiso.accion = accionVer;
+    permiso = await permisoRepository.save(permiso);
+    perfilTienePermiso.perfil = perfilAdmin;
+    perfilTienePermiso.permiso = permiso;
+    perfilTienePermiso.perfilId = perfilAdmin.id;
+    perfilTienePermiso.permisoId = permiso.id;
+    await perfilTienePermisoRepository.save(perfilTienePermiso);
+
+    permiso = new PermisoEntity();
+    permiso.nombre = 'Asignar Perfil';
+    permiso.descripcion = 'Asignar un perfil a un Usuario';
+    permiso.modulo = moduloPerfiles;
+    permiso.accion = accionAsignar;
+    permiso = await permisoRepository.save(permiso);
+    perfilTienePermiso.perfil = perfilAdmin;
+    perfilTienePermiso.permiso = permiso;
+    perfilTienePermiso.perfilId = perfilAdmin.id;
+    perfilTienePermiso.permisoId = permiso.id;
+    await perfilTienePermisoRepository.save(perfilTienePermiso);
+
+    permiso = new PermisoEntity();
+    permiso.nombre = 'Registrar Usuario';
+    permiso.descripcion = 'Registrar un nuevo usuario';
+    permiso.modulo = moduloUsuarios;
+    permiso.accion = accionRegistrar;
+    permiso = await permisoRepository.save(permiso);
+    perfilTienePermiso.perfil = perfilAdmin;
+    perfilTienePermiso.permiso = permiso;
+    perfilTienePermiso.perfilId = perfilAdmin.id;
+    perfilTienePermiso.permisoId = permiso.id;
+    await perfilTienePermisoRepository.save(perfilTienePermiso);
+
+    permiso = new PermisoEntity();
+    permiso.nombre = 'Ver Usuarios';
+    permiso.descripcion = 'Ver la lista de usuarios';
+    permiso.modulo = moduloUsuarios;
+    permiso.accion = accionVer;
+    permiso = await permisoRepository.save(permiso);
+    perfilTienePermiso.perfil = perfilAdmin;
+    perfilTienePermiso.permiso = permiso;
+    perfilTienePermiso.perfilId = perfilAdmin.id;
+    perfilTienePermiso.permisoId = permiso.id;
+    await perfilTienePermisoRepository.save(perfilTienePermiso);
+
+    permiso = new PermisoEntity();
+    permiso.nombre = 'Editar Usuario';
+    permiso.descripcion = 'Editar los datos de un usuario';
+    permiso.modulo = moduloUsuarios;
+    permiso.accion = accionEditar;
+    permiso = await permisoRepository.save(permiso);
+    perfilTienePermiso.perfil = perfilAdmin;
+    perfilTienePermiso.permiso = permiso;
+    perfilTienePermiso.perfilId = perfilAdmin.id;
+    perfilTienePermiso.permisoId = permiso.id;
+    await perfilTienePermisoRepository.save(perfilTienePermiso);
+
+    permiso = new PermisoEntity();
+    permiso.nombre = 'Eliminar Usuario';
+    permiso.descripcion = 'Eliminar un usuario';
+    permiso.modulo = moduloUsuarios;
+    permiso.accion = accionEliminar;
+    permiso = await permisoRepository.save(permiso);
+    perfilTienePermiso.perfil = perfilAdmin;
+    perfilTienePermiso.permiso = permiso;
+    perfilTienePermiso.perfilId = perfilAdmin.id;
+    perfilTienePermiso.permisoId = permiso.id;
+    await perfilTienePermisoRepository.save(perfilTienePermiso);
+
+    permiso = new PermisoEntity();
+    permiso.nombre = 'Registrar Informe';
+    permiso.descripcion = 'Registrar un nuevo informe de paciente';
+    permiso.modulo = moduloInformes;
+    permiso.accion = accionRegistrar;
+    permiso = await permisoRepository.save(permiso);
+    perfilTienePermiso.perfil = perfilAdmin;
+    perfilTienePermiso.permiso = permiso;
+    perfilTienePermiso.perfilId = perfilAdmin.id;
+    perfilTienePermiso.permisoId = permiso.id;
+    await perfilTienePermisoRepository.save(perfilTienePermiso);
+
+    permiso = new PermisoEntity();
+    permiso.nombre = 'Ver Informes';
+    permiso.descripcion = 'Ver la lista de informes de pacientes';
+    permiso.modulo = moduloInformes;
+    permiso.accion = accionVer;
+    permiso = await permisoRepository.save(permiso);
+    perfilTienePermiso.perfil = perfilAdmin;
+    perfilTienePermiso.permiso = permiso;
+    perfilTienePermiso.perfilId = perfilAdmin.id;
+    perfilTienePermiso.permisoId = permiso.id;
+    await perfilTienePermisoRepository.save(perfilTienePermiso);
+
+    permiso = new PermisoEntity();
+    permiso.nombre = 'Editar Informe';
+    permiso.descripcion = 'Editar un informe de paciente';
+    permiso.modulo = moduloInformes;
+    permiso.accion = accionEditar;
+    permiso = await permisoRepository.save(permiso);
+    perfilTienePermiso.perfil = perfilAdmin;
+    perfilTienePermiso.permiso = permiso;
+    perfilTienePermiso.perfilId = perfilAdmin.id;
+    perfilTienePermiso.permisoId = permiso.id;
+    await perfilTienePermisoRepository.save(perfilTienePermiso);
+
+    permiso = new PermisoEntity();
+    permiso.nombre = 'Eliminar Informe';
+    permiso.descripcion = 'Eliminar un informe de paciente';
+    permiso.modulo = moduloInformes;
+    permiso.accion = accionEliminar;
+    permiso = await permisoRepository.save(permiso);
+    perfilTienePermiso.perfil = perfilAdmin;
+    perfilTienePermiso.permiso = permiso;
+    perfilTienePermiso.perfilId = perfilAdmin.id;
+    perfilTienePermiso.permisoId = permiso.id;
+    await perfilTienePermisoRepository.save(perfilTienePermiso);
+
+    permiso = new PermisoEntity();
+    permiso.nombre = 'Registrar Sesión';
+    permiso.descripcion = 'Registrar una nueva sesión con un paciente';
+    permiso.modulo = moduloSesiones;
+    permiso.accion = accionRegistrar;
+    permiso = await permisoRepository.save(permiso);
+    perfilTienePermiso.perfil = perfilAdmin;
+    perfilTienePermiso.permiso = permiso;
+    perfilTienePermiso.perfilId = perfilAdmin.id;
+    perfilTienePermiso.permisoId = permiso.id;
+    await perfilTienePermisoRepository.save(perfilTienePermiso);
+
+    permiso = new PermisoEntity();
+    permiso.nombre = 'Ver Sesiones';
+    permiso.descripcion = 'Ver la lista de sesiones programadas';
+    permiso.modulo = moduloSesiones;
+    permiso.accion = accionVer;
+    permiso = await permisoRepository.save(permiso);
+    perfilTienePermiso.perfil = perfilAdmin;
+    perfilTienePermiso.permiso = permiso;
+    perfilTienePermiso.perfilId = perfilAdmin.id;
+    perfilTienePermiso.permisoId = permiso.id;
+    await perfilTienePermisoRepository.save(perfilTienePermiso);
     
+    permiso = new PermisoEntity();
+    permiso.nombre = 'Editar Sesión';
+    permiso.descripcion = 'Editar una sesión programada';
+    permiso.modulo = moduloSesiones;
+    permiso.accion = accionEditar;
+    permiso = await permisoRepository.save(permiso);
+    perfilTienePermiso.perfil = perfilAdmin;
+    perfilTienePermiso.permiso = permiso;
+    perfilTienePermiso.perfilId = perfilAdmin.id;
+    perfilTienePermiso.permisoId = permiso.id;
+    await perfilTienePermisoRepository.save(perfilTienePermiso);
+
+    permiso = new PermisoEntity();
+    permiso.nombre = 'Eliminar Sesión';
+    permiso.descripcion = 'Eliminar una sesión programada';
+    permiso.modulo = moduloSesiones;
+    permiso.accion = accionEliminar;
+    permiso = await permisoRepository.save(permiso);
+    perfilTienePermiso.perfil = perfilAdmin;
+    perfilTienePermiso.permiso = permiso;
+    perfilTienePermiso.perfilId = perfilAdmin.id;
+    perfilTienePermiso.permisoId = permiso.id;
+    await perfilTienePermisoRepository.save(perfilTienePermiso);
+
+    permiso = new PermisoEntity();
+    permiso.nombre = 'Asignar Profesional';
+    permiso.descripcion = 'Asignar un profesional a una sesión';
+    permiso.modulo = moduloSesiones;
+    permiso.accion = accionAsignar;
+    permiso = await permisoRepository.save(permiso);
+    perfilTienePermiso.perfil = perfilAdmin;
+    perfilTienePermiso.permiso = permiso;
+    perfilTienePermiso.perfilId = perfilAdmin.id;
+    perfilTienePermiso.permisoId = permiso.id;
+    await perfilTienePermisoRepository.save(perfilTienePermiso);
+
+
+
+    /*
     // Primero creamos los módulos si no existen
     const modulos = [
       { nombre: 'Informes' },
@@ -16,7 +283,7 @@ export async function GET() {
     ];
     
     // Mapa para almacenar IDs de módulos
-    const moduloIds = {};
+    const moduloIds: { [key: string]: string } = {};
     
     for (const moduloData of modulos) {
       let modulo = await moduloRepository.findOne({
@@ -24,7 +291,7 @@ export async function GET() {
       });
       
       if (!modulo) {
-        modulo = new Modulo();
+        modulo = new ModuloEntity();
         modulo.nombre = moduloData.nombre;
         await moduloRepository.save(modulo);
         console.log(`Módulo '${moduloData.nombre}' creado.`);
@@ -51,7 +318,7 @@ export async function GET() {
     ];
     
     // Mapa para almacenar IDs de acciones
-    const accionIds = {};
+    const accionIds: { [key: string]: string } = {};
     
     for (const accionData of acciones) {
       let accion = await accionRepository.findOne({
@@ -59,7 +326,7 @@ export async function GET() {
       });
       
       if (!accion) {
-        accion = new Accion();
+        accion = new AccionEntity();
         accion.nombre = accionData.nombre;
         await accionRepository.save(accion);
         console.log(`Acción '${accionData.nombre}' creada.`);
@@ -164,7 +431,7 @@ export async function GET() {
         nombre: 'VerMisSesiones',
         modulo: 'Sesiones',
         accion: 'Ver Mis Sesiones',
-        descripcion: 'Ver solo las sesiones asignadas al usuario (psicólogo o paciente)'
+        descripcion: 'Ver solo las sesiones asignadas al usuario (psicólogo y/o paciente)'
       }
     ];
     
@@ -178,11 +445,20 @@ export async function GET() {
       });
       
       if (!existingPermiso) {
-        const permiso = new Permiso();
+        const permiso = new PermisoEntity();
         permiso.nombre = permisoData.nombre;
         permiso.descripcion = permisoData.descripcion;
-        permiso.moduloId = moduloIds[permisoData.modulo];
-        permiso.accionId = accionIds[permisoData.accion];
+        const modulo = await moduloRepository.findOne({ where: { id: moduloIds[permisoData.modulo] } });
+        if (!modulo) {
+          throw new Error(`No se encontró el módulo con id: ${moduloIds[permisoData.modulo]}`);
+        }
+        permiso.modulo = modulo;
+
+        const accion = await accionRepository.findOne({ where: { id: accionIds[permisoData.accion] } });
+        if (!accion) {
+          throw new Error(`No se encontró la acción con id: ${accionIds[permisoData.accion]}`);
+        }
+        permiso.accion = accion;
         
         await permisoRepository.save(permiso);
         console.log(`Permiso '${permisoData.nombre}' creado.`);
@@ -197,6 +473,7 @@ export async function GET() {
         success: true,
         message: "Seed completado con éxito."
       });
+      */
   } catch (error) {
     console.error('Error al ejecutar seed:', error);
     return NextResponse.json({ 

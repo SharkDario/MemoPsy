@@ -1,5 +1,5 @@
 // dto/usuario.dto.ts
-import { IsString, IsNotEmpty, IsUUID, IsOptional, MinLength, MaxLength, IsEmail, IsBoolean, IsDateString } from 'class-validator';
+import { IsString, IsNotEmpty, IsUUID, IsOptional, MinLength, MaxLength, IsEmail, IsBoolean, IsDateString, Matches } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { PersonaResponseDto } from './persona.dto';
 
@@ -15,6 +15,9 @@ export class CreateUsuarioDto {
   @IsNotEmpty({ message: 'La contraseña no puede estar vacía' })
   @MinLength(8, { message: 'La contraseña debe tener al menos 8 caracteres' })
   @MaxLength(100, { message: 'La contraseña no puede tener más de 100 caracteres' })
+  @Matches(/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).+$/, {
+    message: 'La contraseña debe contener al menos una mayúscula, un número y un carácter especial',
+  })
   password: string;
 
   @IsUUID('4', { message: 'El ID de persona debe ser un UUID válido' })
@@ -38,6 +41,9 @@ export class UpdateUsuarioDto {
   @IsString({ message: 'La contraseña debe ser una cadena de texto' })
   @MinLength(8, { message: 'La contraseña debe tener al menos 8 caracteres' })
   @MaxLength(100, { message: 'La contraseña no puede tener más de 100 caracteres' })
+  @Matches(/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).+$/, {
+    message: 'La contraseña debe contener al menos una mayúscula, un número y un carácter especial',
+  })
   password?: string;
 
   @IsOptional()
@@ -71,6 +77,9 @@ export class ChangePasswordDto {
   @IsNotEmpty({ message: 'La nueva contraseña no puede estar vacía' })
   @MinLength(8, { message: 'La nueva contraseña debe tener al menos 8 caracteres' })
   @MaxLength(100, { message: 'La nueva contraseña no puede tener más de 100 caracteres' })
+  @Matches(/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).+$/, {
+    message: 'La contraseña debe contener al menos una mayúscula, un número y un carácter especial',
+  })
   newPassword: string;
 }
 

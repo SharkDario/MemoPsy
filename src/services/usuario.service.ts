@@ -52,7 +52,8 @@ export class UsuarioService {
       password: hashedPassword,
       activo: createUsuarioDto.activo ?? true,
       ultimoAcceso: new Date(),
-      persona: personaModel
+      persona: personaModel,
+      auth0Id: '',
     });
 
     // Convertir a entidad y guardar

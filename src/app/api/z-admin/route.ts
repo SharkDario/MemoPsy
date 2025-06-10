@@ -1,7 +1,7 @@
-
+//app/api/z-admin/route.ts
 import { NextResponse } from "next/server";
 import { AppDataSource } from '@/lib/database';
-import { Usuario, Persona } from "@/entities";
+import { UsuarioEntity, PersonaEntity } from "@/entities";
 import * as bcrypt from "bcrypt";
 
 export async function GET() {
@@ -11,7 +11,7 @@ export async function GET() {
       await AppDataSource.initialize();
     }
     // Crear persona para el administrador
-    const adminPersona = new Persona();
+    const adminPersona = new PersonaEntity();
     adminPersona.nombre = "Dario";
     adminPersona.apellido = "Coronel";
     adminPersona.dni = "10000000";
@@ -21,15 +21,16 @@ export async function GET() {
     console.log("Persona para admin creada con ID:", adminPersona.id);
 
     // Hashear la contraseña
-    const hashedPassword = await bcrypt.hash("admin123", 10); // Cambia "admin123" por una contraseña segura
+    const hashedPassword = await bcrypt.hash("Admin$07", 10); 
 
     // Crear usuario administrador
-    const adminUser = new Usuario();
-    adminUser.email = "admin@memopsy.com"; // Cambia por el email que prefieras
+    const adminUser = new UsuarioEntity();
+    adminUser.email = "mdarioc1998@gmail.com";
     adminUser.password = hashedPassword;
     adminUser.activo = true;
-    adminUser.personaId = adminPersona.id;
+    adminUser.persona = adminPersona;
     adminUser.ultimoAcceso = new Date();
+    //adminUser.auth0Id
 
     await AppDataSource.manager.save(adminUser);
     console.log("Usuario administrador creado con ID:", adminUser.id);

@@ -9,6 +9,7 @@ export class Usuario extends Base {
     private _activo: boolean;
     private _ultimoAcceso: Date;
     private _persona?: Persona;
+    private _auth0Id: string;
     
     constructor(data: {
         id?: string;
@@ -17,6 +18,7 @@ export class Usuario extends Base {
         activo: boolean;
         ultimoAcceso: Date;
         persona?: Persona;
+        auth0Id?: string;
     }) {
         super({ id: data.id });
         this._email = data.email; // Usa el setter para validación
@@ -24,6 +26,7 @@ export class Usuario extends Base {
         this._activo = data.activo; // Usa el setter para validación
         this._ultimoAcceso = data.ultimoAcceso; // Usa el setter para validación
         this._persona = data.persona;
+        this._auth0Id = data.auth0Id ?? "";
     }
     
     // Getters y Setters
@@ -43,6 +46,19 @@ export class Usuario extends Base {
         this._password = value;
     }
     
+    // Getter para auth0Id
+    get auth0Id(): string {
+        return this._auth0Id;
+    }
+
+    // Setter para auth0Id
+    set auth0Id(value: string) {
+        if (!value || value.trim() === "") {
+            throw new Error("auth0Id no puede estar vacío.");
+        }
+        this._auth0Id = value;
+    }
+
     get activo(): boolean { return this._activo; }
     set activo(value: boolean) { this._activo = value; }
     
@@ -65,7 +81,8 @@ export class Usuario extends Base {
         password: entity.password,
         activo: entity.activo,
         ultimoAcceso: entity.ultimoAcceso,
-        persona: Persona.fromEntity(entity.persona)
+        persona: Persona.fromEntity(entity.persona),
+        auth0Id: entity.auth0Id ?? undefined,
         });
     }
     
@@ -76,6 +93,7 @@ export class Usuario extends Base {
         password: this.password,
         activo: this.activo,
         ultimoAcceso: this.ultimoAcceso,
+        auth0Id: this.auth0Id ?? null,
         };
     }
 }

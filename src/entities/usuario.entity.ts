@@ -20,4 +20,7 @@ export class UsuarioEntity extends BaseEntity {
   @OneToOne("PersonaEntity")
   @JoinColumn({ name: "persona_id" })
   persona: PersonaEntity;
+
+  @Column({ name: "auth0Id", unique: true, nullable: true})
+  auth0Id: string;
 }
