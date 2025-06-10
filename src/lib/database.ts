@@ -101,3 +101,7 @@ export async function getRepository(entity: any) {
   return dataSource.getRepository(entity)
 }
 
+// Función para obtener el DataSource directamente
+export async function getDataSource() {
+  return await initializeDatabase()
+}

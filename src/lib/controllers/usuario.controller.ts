@@ -87,7 +87,7 @@ export class UsuarioController {
 
       // Verificar permisos
       const hasPermission = session.user.permisos.some(
-        permiso => permiso.modulo.nombre === 'Usuarios' && permiso.accion.nombre === 'Crear'
+        permiso => permiso.modulo.nombre === 'Usuarios' && permiso.accion.nombre === 'Registrar'
       );
 
       if (!hasPermission) {

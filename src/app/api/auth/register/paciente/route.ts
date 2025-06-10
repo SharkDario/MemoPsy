@@ -1,6 +1,6 @@
 // app/api/register/paciente/route.ts
 import { NextResponse } from 'next/server';
-import { Usuario, Persona, Paciente, Perfil } from '@/entities/';
+import { UsuarioEntity, PersonaEntity, PacienteEntity, PerfilEntity } from '@/entities/';
 // import { Perfil } from '@/lib/entities/Perfil';
 import { initializeDatabase } from '@/lib/database';
 import bcrypt from 'bcrypt';
@@ -17,11 +17,11 @@ export async function POST(request: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const db = await initializeDatabase();
-    let pacienteGuardado: Paciente | null = null;
+    let pacienteGuardado: PacienteEntity | null = null;
 
     await db.transaction(async (manager: any) => {
         // 1. Crear Persona
-        const nuevaPersona = new Persona();
+        const nuevaPersona = new PersonaEntity();
         nuevaPersona.nombre = nombre;
         nuevaPersona.apellido = apellido;
         nuevaPersona.dni = dni;
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
         if (!perfilPaciente) throw new Error("Perfil 'Paciente' no encontrado");
 
         // 3. Crear Usuario
-        const usuario = new Usuario();
+        const usuario = new UsuarioEntity();
         usuario.email = email;
         usuario.password = hashedPassword;
         usuario.personaId = personaGuardada.id;
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
         const usuarioGuardado = await manager.save(usuario);
 
         // 4. Crear Paciente
-        const paciente = new Paciente();
+        const paciente = new PacienteEntity();
         paciente.usuarioId = usuarioGuardado.id;
         paciente.fechaRegistro = new Date(); // Fecha actual por defecto
         pacienteGuardado = await manager.save(paciente);

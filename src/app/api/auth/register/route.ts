@@ -1,6 +1,6 @@
 // app/api/auth/register/route.ts
 import { NextResponse } from 'next/server';
-import { Usuario, Persona } from '@/entities/';
+import { UsuarioEntity, PersonaEntity } from '@/entities/';
 // import { Perfil } from '@/lib/entities/Perfil'; // Si necesitas buscar el perfil
 // import { getDbConnection } from "@/lib/database";
 import { initializeDatabase } from '@/lib/database';
@@ -20,12 +20,12 @@ export async function POST(request: Request) {
     const hashedPassword = await bcrypt.hash(password, 10); // Hashear contraseña
     const db = await initializeDatabase();
 
-    let nuevoUsuario: Usuario | null = null;
+    let nuevoUsuario: UsuarioEntity | null = null;
 
     // Usar transacción para asegurar atomicidad
     await db.transaction(async (manager: any) => { // 'manager' sería tu EntityManager de TypeORM
         // 1. Crear Persona
-        const nuevaPersona = new Persona();
+        const nuevaPersona = new PersonaEntity();
         nuevaPersona.nombre = nombre;
         nuevaPersona.apellido = apellido;
         nuevaPersona.dni = dni || null; // Manejar opcionales
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
         //console.log("Perfil encontrado (mock):", perfilPorDefecto);
 
         // 3. Crear Usuario
-        const usuario = new Usuario();
+        const usuario = new UsuarioEntity();
         usuario.email = email;
         usuario.password = hashedPassword;
         usuario.personaId = personaGuardada.id; // Usar el ID de la persona guardada

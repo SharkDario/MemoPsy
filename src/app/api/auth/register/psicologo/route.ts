@@ -1,6 +1,6 @@
 // app/api/register/psicologo/route.ts
 import { NextResponse } from 'next/server';
-import { Usuario, Persona, Psicologo, Perfil } from '@/entities/';
+import { UsuarioEntity, PersonaEntity, PsicologoEntity, PerfilEntity } from '@/entities/';
 // import { Perfil } from '@/lib/entities/Perfil';
 import { initializeDatabase } from '@/lib/database';
 import bcrypt from 'bcrypt';
@@ -17,11 +17,11 @@ export async function POST(request: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const db = await initializeDatabase();
-    let psicologoGuardado: Psicologo | null = null;
+    let psicologoGuardado: PsicologoEntity | null = null;
 
     await db.transaction(async (manager: any) => {
         // 1. Crear Persona (igual que antes)
-        const nuevaPersona = new Persona();
+        const nuevaPersona = new PersonaEntity();
         nuevaPersona.nombre = nombre;
         nuevaPersona.apellido = apellido;
         nuevaPersona.dni = dni;
@@ -30,11 +30,11 @@ export async function POST(request: Request) {
         const personaGuardada = await manager.save(nuevaPersona);
 
         // 2. Buscar Perfil "Psicologo" - ¡Placeholder!
-        const perfilPsicologo = await manager.findOne(Perfil, { where: { nombre: 'Perfil Psicólogo' } });
+        const perfilPsicologo = await manager.findOne(PerfilEntity, { where: { nombre: 'Perfil Psicólogo' } });
         if (!perfilPsicologo) throw new Error("Perfil 'Psicologo' no encontrado");
 
         // 3. Crear Usuario (igual que antes, pero con perfilPsicologo.id)
-        const usuario = new Usuario();
+        const usuario = new UsuarioEntity();
         usuario.email = email;
         usuario.password = hashedPassword;
         usuario.personaId = personaGuardada.id;
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
         const usuarioGuardado = await manager.save(usuario);
 
         // 4. Crear Psicologo
-        const psicologo = new Psicologo();
+        const psicologo = new PsicologoEntity();
         psicologo.usuarioId = usuarioGuardado.id;
         psicologo.especialidad = especialidad || null;
         psicologo.numeroLicencia = numeroLicencia || null;
