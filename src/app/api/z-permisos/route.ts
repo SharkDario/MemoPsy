@@ -13,6 +13,7 @@ export async function GET() {
     const moduloRepository = AppDataSource.getRepository(ModuloEntity);
     const accionRepository = AppDataSource.getRepository(AccionEntity);
 
+    /*
     let perfilAdmin = new PerfilEntity();
     perfilAdmin.nombre = "Administrador";
     perfilAdmin.descripcion = "Administrador con todos los permisos"
@@ -45,19 +46,46 @@ export async function GET() {
     let accionAsignar = new AccionEntity();
     accionAsignar.nombre = 'Asignar';
     await accionRepository.save(accionAsignar);
+    */
 
-    moduloUsuarios = await moduloRepository.findOne({where: { nombre: 'Usuarios' }});
-    moduloInformes = await moduloRepository.findOne({where: { nombre: 'Informes' }});
-    moduloSesiones = await moduloRepository.findOne({where: { nombre: 'Sesiones' }});
-    accionRegistrar = await accionRepository.findOne({where: { nombre: 'Registrar' }});
-    accionVer = await accionRepository.findOne({where: { nombre: 'Ver' }});
-    accionEditar = await accionRepository.findOne({where: { nombre: 'Editar' }});
-    accionEliminar = await accionRepository.findOne({where: { nombre: 'Eliminar' }});
-    accionAsignar = await accionRepository.findOne({where: { nombre: 'Asignar' }});
-    perfilAdmin = await perfilRepository.findOne({where: {nombre: 'Administrador'}})
+    //const moduloUsuarios = await moduloRepository.findOne({where: { nombre: 'Usuarios' }});
+    const moduloInformes = await moduloRepository.findOne({where: { nombre: 'Informes' }});
+    const moduloSesiones = await moduloRepository.findOne({where: { nombre: 'Sesiones' }});
+    const accionRegistrar = await accionRepository.findOne({where: { nombre: 'Registrar' }});
+    const accionVer = await accionRepository.findOne({where: { nombre: 'Ver' }});
+    const accionEditar = await accionRepository.findOne({where: { nombre: 'Editar' }});
+    const accionEliminar = await accionRepository.findOne({where: { nombre: 'Eliminar' }});
+    const accionAsignar = await accionRepository.findOne({where: { nombre: 'Asignar' }});
+    const perfilAdmin = await perfilRepository.findOne({where: {nombre: 'Administrador'}})
 
-    let permiso = new PermisoEntity();
-    let perfilTienePermiso = new PerfilTienePermisoEntity();
+    if (!moduloInformes) {
+      throw new Error("No se encontró el módulo 'Informes'");
+    }
+    if (!moduloSesiones) {
+      throw new Error("No se encontró el módulo 'Sesiones'");
+    }
+    if (!accionRegistrar) {
+      throw new Error("No se encontró la acción 'Registrar'");
+    }
+    if (!accionVer) {
+      throw new Error("No se encontró la acción 'Ver'");
+    }
+    if (!accionEditar) {
+      throw new Error("No se encontró la acción 'Editar'");
+    }
+    if (!accionEliminar) {
+      throw new Error("No se encontró la acción 'Eliminar'");
+    }
+    if (!accionAsignar) {
+      throw new Error("No se encontró la acción 'Asignar'");
+    }
+    if (!perfilAdmin) {
+      throw new Error("No se encontró el perfil 'Administrador'");
+    }
+
+    //let permiso = new PermisoEntity();
+    //let perfilTienePermiso = new PerfilTienePermisoEntity();
+    /*
     permiso.nombre = 'Registrar Perfil';
     permiso.descripcion = 'Registrar un nuevo perfil';
     permiso.modulo = moduloPerfiles;
@@ -164,13 +192,16 @@ export async function GET() {
     perfilTienePermiso.perfilId = perfilAdmin.id;
     perfilTienePermiso.permisoId = permiso.id;
     await perfilTienePermisoRepository.save(perfilTienePermiso);
+    */
 
-    permiso = new PermisoEntity();
+    /*
+    let permiso = new PermisoEntity();
     permiso.nombre = 'Registrar Informe';
     permiso.descripcion = 'Registrar un nuevo informe de paciente';
     permiso.modulo = moduloInformes;
     permiso.accion = accionRegistrar;
     permiso = await permisoRepository.save(permiso);
+    let perfilTienePermiso = new PerfilTienePermisoEntity();
     perfilTienePermiso.perfil = perfilAdmin;
     perfilTienePermiso.permiso = permiso;
     perfilTienePermiso.perfilId = perfilAdmin.id;
@@ -236,13 +267,16 @@ export async function GET() {
     perfilTienePermiso.perfilId = perfilAdmin.id;
     perfilTienePermiso.permisoId = permiso.id;
     await perfilTienePermisoRepository.save(perfilTienePermiso);
+    */
     
+    let permiso = new PermisoEntity();
     permiso = new PermisoEntity();
     permiso.nombre = 'Editar Sesión';
     permiso.descripcion = 'Editar una sesión programada';
     permiso.modulo = moduloSesiones;
     permiso.accion = accionEditar;
     permiso = await permisoRepository.save(permiso);
+    let perfilTienePermiso = new PerfilTienePermisoEntity();
     perfilTienePermiso.perfil = perfilAdmin;
     perfilTienePermiso.permiso = permiso;
     perfilTienePermiso.perfilId = perfilAdmin.id;

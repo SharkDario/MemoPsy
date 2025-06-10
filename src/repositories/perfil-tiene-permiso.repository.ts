@@ -24,7 +24,7 @@ export class PerfilTienePermisoRepository {
     async findByPerfilId(perfilId: string): Promise<PerfilTienePermisoEntity[]> {
         return await this.repository.find({
         where: { perfilId },
-        relations: ['perfil', 'permiso'],
+        relations: ['perfil', 'permiso', 'permiso.modulo', 'permiso.accion' ],
         });
     }
 

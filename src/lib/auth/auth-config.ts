@@ -98,13 +98,14 @@ export const authConfig: NextAuthOptions = {
           console.log('🔤 Tipo de Usuario ID:', typeof loginResult.usuario.id);
 
           // Primero, verificar si existen perfiles para este usuario
-          const perfilCount = await usuarioTienePerfilRepository.count({
-            where: { usuarioId: loginResult.usuario.id }
-          });
+          //const perfilCount = await usuarioTienePerfilRepository.count({
+          //  where: { usuarioId: loginResult.usuario.id }
+          //});
+          const perfilCount = usuarioTienePerfilRepository.countByUsuarioId(loginResult.usuario.id)
           console.log('📊 Cantidad de perfiles encontrados:', perfilCount);
 
-          let perfiles = [];
-          if (perfilCount > 0) {
+          let perfiles: any[] = [];
+          if (await perfilCount > 0) {
             try {
               console.log('🔄 Obteniendo perfiles...');
               perfiles = await usuarioTienePerfilService.obtenerPerfilesDeUsuario(

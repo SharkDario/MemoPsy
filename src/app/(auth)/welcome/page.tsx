@@ -1,4 +1,5 @@
 // app/welcome/page.tsx
+// app/welcome/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -6,7 +7,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import MemopsyLogo from "@/app/components/MemopsyLogo";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Users, Calendar, FileText, LogOut, Settings } from 'lucide-react';
+import { Menu, X, Users, Calendar, FileText, LogOut, Settings, Shield } from 'lucide-react';
 
 interface ModuloConfig {
   id: string;
@@ -14,7 +15,7 @@ interface ModuloConfig {
   descripcion: string;
   icon: any;
   ruta: string;
-  permisoRequerido: string; // nombre del módulo que debe tener permiso
+  permisosRequeridos: string[]; // Cambiado a array de permisos específicos
 }
 
 const MODULOS_DISPONIBLES: ModuloConfig[] = [
@@ -24,7 +25,7 @@ const MODULOS_DISPONIBLES: ModuloConfig[] = [
     descripcion: 'Gestión de usuarios del sistema',
     icon: Users,
     ruta: '/usuarios',
-    permisoRequerido: 'usuarios'
+    permisosRequeridos: ['Ver Usuarios', 'Registrar Usuario', 'Editar Usuario', 'Eliminar Usuario']
   },
   {
     id: 'sesiones',
@@ -32,7 +33,15 @@ const MODULOS_DISPONIBLES: ModuloConfig[] = [
     descripcion: 'Administración de sesiones',
     icon: Calendar,
     ruta: '/sesiones',
-    permisoRequerido: 'sesiones'
+    permisosRequeridos: ['Ver Sesiones', 'Registrar Sesión', 'Editar Sesión', 'Eliminar Sesión', 'Asignar Profesional']
+  },
+  {
+    id: 'perfiles',
+    nombre: 'Perfiles',
+    descripcion: 'Administración de perfiles y roles',
+    icon: Shield,
+    ruta: '/perfiles',
+    permisosRequeridos: ['Ver Perfiles', 'Registrar Perfil', 'Editar Perfil', 'Eliminar Perfil', 'Asignar Perfil']
   },
   {
     id: 'informes',
@@ -40,7 +49,7 @@ const MODULOS_DISPONIBLES: ModuloConfig[] = [
     descripcion: 'Generación de reportes',
     icon: FileText,
     ruta: '/informes',
-    permisoRequerido: 'informes'
+    permisosRequeridos: ['Ver Informes', 'Registrar Informe', 'Editar Informe', 'Eliminar Informe']
   }
 ];
 
@@ -58,12 +67,16 @@ export default function WelcomePage() {
 
   useEffect(() => {
     if (session?.user?.permisos) {
-      // Filtrar módulos basado en permisos del usuario
+      // Obtener nombres de permisos del usuario
+      const permisosUsuario = session.user.permisos.map((permiso: any) => permiso.nombre);
+      
+      // Filtrar módulos basado en si el usuario tiene al menos uno de los permisos requeridos
       const modulosConPermiso = MODULOS_DISPONIBLES.filter(modulo => {
-        return session.user.permisos.some((permiso: any) => 
-          permiso.modulo?.nombre?.toLowerCase() === modulo.permisoRequerido.toLowerCase()
+        return modulo.permisosRequeridos.some(permisoRequerido => 
+          permisosUsuario.includes(permisoRequerido)
         );
       });
+      
       setModulosPermitidos(modulosConPermiso);
     }
   }, [session]);
@@ -71,7 +84,7 @@ export default function WelcomePage() {
   const handleLogout = async () => {
     await signOut({ 
       redirect: true,
-      callbackUrl: '/auth/login'
+      callbackUrl: '/login'
     });
   };
 
