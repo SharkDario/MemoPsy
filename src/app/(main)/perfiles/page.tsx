@@ -5,7 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import MemopsyLogo from "@/app/components/MemopsyLogo";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Users, UserPlus, List, UserCog, Shield, LogOut, FileText, Calendar, HomeIcon } from 'lucide-react'; // Added ShieldPlus, Settings2
+import { Menu, X, Users, UserPlus, List, Edit3, Shield, LogOut, FileText, Calendar, HomeIcon } from 'lucide-react'; // Added ShieldPlus, Settings2
 
 interface SubModuloConfig {
   id: string;
@@ -32,6 +32,14 @@ const SUB_MODULOS_PERFILES: SubModuloConfig[] = [
     icon: List,
     ruta: '/perfiles/listar',
     permisoRequerido: 'Ver Perfiles',
+  },
+  {
+    id: 'editar_usuario_general',
+    nombre: 'Editar Usuarios',
+    descripcion: 'Modificar información y perfiles de usuarios existentes (desde la lista).',
+    icon: Edit3,
+    ruta: '/usuarios/listar', 
+    permisoRequerido: 'Editar Usuario',
   },
 ];
 
