@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
     const { persona, usuario, roles, psicologo, paciente } = body
 
     // Validaciones básicas
-    if (!persona || !usuario || !roles) {
+    if (!persona || !usuario) {
       // IMPORTANTE: Hacer rollback antes de devolver error
       await queryRunner.rollbackTransaction();
       return NextResponse.json(
@@ -132,23 +132,23 @@ export async function POST(request: NextRequest) {
     const obraSocialRepo = queryRunner.manager.getRepository(ObraSocialEntity)
 
     // Validaciones de duplicados
-    const [existingUser, existingPersona] = await Promise.all([
-      usuarioRepo.findOne({ where: { email: usuario.email } }),
-      personaRepo.findOne({ where: { dni: persona.dni } }),
+    const [existingPersona, existingUser] = await Promise.all([
+      personaRepo.findOne({ where: { dni: persona.dni } }),      // 🔍 Busca por DNI -> existingPersona
+      usuarioRepo.findOne({ where: { email: usuario.email } }),  // 📧 Busca por EMAIL -> existingUser
     ]);
-
-    if (existingUser) {
-      await queryRunner.rollbackTransaction();
-      return NextResponse.json(
-        { message: "El email ya está registrado", errors: { email: "Este email ya está en uso" } },
-        { status: 400 },
-      )
-    }
 
     if (existingPersona) {
       await queryRunner.rollbackTransaction();
       return NextResponse.json(
         { message: "El DNI ya está registrado", errors: { dni: "Este DNI ya está en uso" } },
+        { status: 400 },
+      )
+    }
+
+    if (existingUser) {
+      await queryRunner.rollbackTransaction();
+      return NextResponse.json(
+        { message: "El email ya está registrado", errors: { email: "Este email ya está en uso" } },
         { status: 400 },
       )
     }
@@ -161,6 +161,8 @@ export async function POST(request: NextRequest) {
       fechaNacimiento: new Date(persona.fechaNacimiento),
     })
 
+    const personaGuardada = await personaRepo.save(nuevaPersona)
+
     // Crear usuario
     const hashedPassword = await bcrypt.hash(usuario.password, 12)
     const nuevoUsuario = usuarioRepo.create({
@@ -168,11 +170,10 @@ export async function POST(request: NextRequest) {
       password: hashedPassword,
       activo: usuario.activo,
       ultimoAcceso: new Date(usuario.ultimoAcceso),
-      persona: nuevaPersona,
+      persona: personaGuardada,
     })
 
     // Guardar persona y usuario
-    const personaGuardada = await personaRepo.save(nuevaPersona)
     const usuarioGuardado = await usuarioRepo.save(nuevoUsuario)
 
     const resultados = {

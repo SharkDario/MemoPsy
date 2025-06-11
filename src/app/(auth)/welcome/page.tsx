@@ -7,7 +7,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import MemopsyLogo from "@/app/components/MemopsyLogo";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Users, Calendar, FileText, LogOut, Settings, Shield } from 'lucide-react';
+import { Menu, X, Users, Calendar, FileText, LogOut, Settings, Shield, HomeIcon } from 'lucide-react';
 
 interface ModuloConfig {
   id: string;
@@ -165,8 +165,8 @@ export default function WelcomePage() {
                       onClick={() => navigateToModule(modulo.ruta)}
                       className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors"
                       style={{ backgroundColor: 'transparent' }}
-                      onMouseEnter={(e) => e.target.style.backgroundColor = '#152A2A'}
-                      onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                      onMouseEnter={(e) => ((e.target as HTMLElement).style.backgroundColor = "#152A2A")}
+                      onMouseLeave={(e) => ((e.target as HTMLElement).style.backgroundColor = "transparent")}
                     >
                       <IconComponent className="w-5 h-5 mr-3" />
                       <div>
@@ -186,18 +186,19 @@ export default function WelcomePage() {
             {/* Opciones adicionales */}
             <div className="p-2 border-t border-gray-600">
               <button
-                onClick={() => {
-                  // Aquí puedes agregar navegación a configuración/perfil
-                  setIsMenuOpen(false);
-                }}
-                className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors"
-                style={{ backgroundColor: 'transparent' }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#152A2A'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+              onClick={() => {
+                router.push("/welcome");
+              }}
+              className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors"
+              style={{ backgroundColor: "transparent" }}
+              onMouseEnter={(e) => ((e.target as HTMLElement).style.backgroundColor = "#152A2A")}
+              onMouseLeave={(e) => ((e.target as HTMLElement).style.backgroundColor = "transparent")}
               >
-                <Settings className="w-5 h-5 mr-3" />
-                Configuración
+              <HomeIcon className="w-5 h-5 mr-3" />
+              Home
               </button>
+
+
               
               <button
                 onClick={handleLogout}

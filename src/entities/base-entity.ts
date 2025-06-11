@@ -1,6 +1,6 @@
 import { PrimaryGeneratedColumn } from "typeorm"
 
 export abstract class BaseEntity {
-  @PrimaryGeneratedColumn("uuid")
-  id: string
+  @PrimaryGeneratedColumn('increment', { type: 'int' })
+  id: int
 }

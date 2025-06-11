@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch"; // For 'activo' status
-import { Menu, X, Users, Calendar, FileText, LogOut, Settings, Shield, UserCircle, Briefcase, Activity, AlertCircle } from 'lucide-react';
+import { Menu, X, Users, Calendar, FileText, LogOut, HomeIcon, Shield, UserCircle, Briefcase, Activity, AlertCircle } from 'lucide-react';
 
 // Define types according to new structure
 interface ObraSocial {
@@ -439,7 +439,18 @@ export default function EditarUsuarioPage() {
             <div className="p-4 border-b border-gray-600"><p className="text-sm text-gray-300">Conectado como:</p><p className="font-semibold text-white">{session?.user?.email}</p><p className="text-sm" style={{ color: '#F1C77A' }}>{currentUserName}</p></div>
             <div className="p-2"><h3 className="px-2 py-1 text-sm font-semibold text-gray-300 uppercase tracking-wide">Módulos</h3>
               {modulosPermitidos.map(m => <button key={m.id} onClick={() => navigateToModule(m.ruta)} className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors" style={{backgroundColor: 'transparent'}} onMouseEnter={e=>(e.target as HTMLElement).style.backgroundColor='#152A2A'} onMouseLeave={e=>(e.target as HTMLElement).style.backgroundColor='transparent'}><m.icon className="w-5 h-5 mr-3" /> {m.nombre}</button>)}</div>
-            <div className="p-2 border-t border-gray-600"><button onClick={() => router.push('/settings')} className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors" style={{backgroundColor: 'transparent'}} onMouseEnter={e=>(e.target as HTMLElement).style.backgroundColor='#152A2A'} onMouseLeave={e=>(e.target as HTMLElement).style.backgroundColor='transparent'}><Settings className="w-5 h-5 mr-3" /> Configuración</button><button onClick={handleLogout} className="w-full flex items-center px-2 py-2 text-left text-red-400 hover:bg-red-900 hover:bg-opacity-20 rounded-lg transition-colors"><LogOut className="w-5 h-5 mr-3" /> Cerrar Sesión</button></div>
+            <div className="p-2 border-t border-gray-600"><button
+              onClick={() => {
+                router.push("/welcome");
+              }}
+              className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors"
+              style={{ backgroundColor: "transparent" }}
+              onMouseEnter={(e) => ((e.target as HTMLElement).style.backgroundColor = "#152A2A")}
+              onMouseLeave={(e) => ((e.target as HTMLElement).style.backgroundColor = "transparent")}
+              >
+              <HomeIcon className="w-5 h-5 mr-3" />
+              Home
+              </button><button onClick={handleLogout} className="w-full flex items-center px-2 py-2 text-left text-red-400 hover:bg-red-900 hover:bg-opacity-20 rounded-lg transition-colors"><LogOut className="w-5 h-5 mr-3" /> Cerrar Sesión</button></div>
           </div>
         )}
       </nav>

@@ -16,7 +16,7 @@ import {
   Calendar,
   FileText,
   LogOut,
-  Settings,
+  HomeIcon,
   Shield,
   Edit3,
   UserCheck,
@@ -241,7 +241,7 @@ export default function ListarUsuariosPage() {
     router.push(ruta)
     setIsMenuOpen(false)
   }
-  const navigateToRegister = () => router.push("/registrar-usuario")
+  const navigateToRegister = () => router.push("/usuarios/registrar")
 
   const nombreCompleto = session?.user?.persona
     ? `${session.user.persona.nombre} ${session.user.persona.apellido}`
@@ -330,13 +330,16 @@ export default function ListarUsuariosPage() {
             </div>
             <div className="p-2 border-t border-gray-600">
               <button
-                onClick={() => router.push("/settings")}
-                className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors"
-                style={{ backgroundColor: "transparent" }}
-                onMouseEnter={(e) => ((e.target as HTMLElement).style.backgroundColor = "#152A2A")}
-                onMouseLeave={(e) => ((e.target as HTMLElement).style.backgroundColor = "transparent")}
+              onClick={() => {
+                router.push("/welcome");
+              }}
+              className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors"
+              style={{ backgroundColor: "transparent" }}
+              onMouseEnter={(e) => ((e.target as HTMLElement).style.backgroundColor = "#152A2A")}
+              onMouseLeave={(e) => ((e.target as HTMLElement).style.backgroundColor = "transparent")}
               >
-                <Settings className="w-5 h-5 mr-3" /> Configuración
+              <HomeIcon className="w-5 h-5 mr-3" />
+              Home
               </button>
               <button
                 onClick={handleLogout}

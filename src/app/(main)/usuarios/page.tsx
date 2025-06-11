@@ -5,7 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import MemopsyLogo from "@/app/components/MemopsyLogo";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Users, UserPlus, List, Edit3, UserCog, Calendar, FileText, Settings, Shield, LogOut } from 'lucide-react';
+import { Menu, X, Users, UserPlus, List, Edit3, UserCog, Calendar, FileText, HomeIcon, Shield, LogOut } from 'lucide-react';
 
 interface SubModuloConfig {
   id: string;
@@ -36,7 +36,7 @@ const SUB_MODULOS_USUARIOS: SubModuloConfig[] = [
   {
     id: 'editar_usuario_general',
     nombre: 'Editar Usuarios',
-    descripcion: 'Modificar información y roles de usuarios existentes (desde la lista).',
+    descripcion: 'Modificar información y perfiles de usuarios existentes (desde la lista).',
     icon: Edit3,
     ruta: '/usuarios/listar', 
     permisoRequerido: 'Editar Usuario',
@@ -47,7 +47,7 @@ const SUB_MODULOS_USUARIOS: SubModuloConfig[] = [
     descripcion: 'Cambiar el estado de actividad de las cuentas de usuario (desde la lista).',
     icon: UserCog, 
     ruta: '/usuarios/listar', 
-    permisoRequerido: 'Eliminar Usuario', // As per issue spec, maps to "Eliminar Usuario"
+    permisoRequerido: 'Eliminar Usuario',
   },
 ];
 
@@ -230,14 +230,16 @@ export default function UsuariosPage() {
 
             <div className="p-2 border-t border-gray-600">
               <button
-                onClick={() => { /* Navigate to settings or profile */ setIsMenuOpen(false); }}
-                className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors"
-                style={{ backgroundColor: 'transparent' }}
-                onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#152A2A'}
-                onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
+              onClick={() => {
+                router.push("/welcome");
+              }}
+              className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors"
+              style={{ backgroundColor: "transparent" }}
+              onMouseEnter={(e) => ((e.target as HTMLElement).style.backgroundColor = "#152A2A")}
+              onMouseLeave={(e) => ((e.target as HTMLElement).style.backgroundColor = "transparent")}
               >
-                <Settings className="w-5 h-5 mr-3" />
-                Configuración
+              <HomeIcon className="w-5 h-5 mr-3" />
+              Home
               </button>
               <button
                 onClick={handleLogout}
