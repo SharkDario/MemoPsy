@@ -1,9 +1,9 @@
-// src/app/api/psicologos/route.ts
 import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth/next"
 import { authConfig } from "@/lib/auth/auth-config"
 import { initializeDatabase } from "@/lib/database"
 import { PsicologoEntity } from "@/entities"
+import { Like } from "typeorm"
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,16 +13,21 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
 
+    const searchParams = request.nextUrl.searchParams
+    const query = searchParams.get("q") || ""
+
     const dataSource = await initializeDatabase()
     const psicologoRepository = dataSource.getRepository(PsicologoEntity)
 
     const psicologos = await psicologoRepository.find({
       relations: ["persona"],
+      where: [{ persona: { nombre: Like(`%${query}%`) } }, { persona: { apellido: Like(`%${query}%`) } }],
       order: {
         persona: {
           apellido: "ASC",
         },
       },
+      take: 10, // Limitar resultados
     })
 
     const psicologosTransformados = psicologos.map((psicologo) => ({
@@ -32,25 +37,13 @@ export async function GET(request: NextRequest) {
       persona: {
         nombre: psicologo.persona.nombre,
         apellido: psicologo.persona.apellido,
+        nombreCompleto: `${psicologo.persona.nombre} ${psicologo.persona.apellido}`,
       },
     }))
 
     return NextResponse.json(psicologosTransformados)
   } catch (error) {
-    console.error("Error fetching psychologists:", error)
+    console.error("Error searching psychologists:", error)
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 })
   }
 }
-
-/*
-import { NextRequest } from 'next/server';
-import { PsicologoController } from '@/lib/controllers/psicologo.controller';
-
-export async function GET(request: NextRequest) {
-  return PsicologoController.getAllPsicologos(request);
-}
-
-export async function POST(request: NextRequest) {
-  return PsicologoController.createPsicologo(request);
-}
-  */

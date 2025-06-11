@@ -20,7 +20,7 @@ import {
   LogOut,
   HomeIcon,
   Shield,
-  Briefcase,
+  Brain,
   Activity,
   AlertCircle,
 } from "lucide-react"
@@ -724,7 +724,7 @@ export default function EditarUsuarioPage() {
                       className="data-[state=checked]:bg-teal-600 data-[state=unchecked]:bg-gray-600 disabled:opacity-50"
                     />
                     <Label htmlFor="isPsicologo" className="text-gray-200 flex items-center">
-                      <Briefcase className="w-5 h-5 mr-2 text-teal-400" /> Psicólogo
+                      <Brain className="w-5 h-5 mr-2 text-teal-400" /> Psicólogo
                       {hasExistingPsicologoData && (
                         <span className="text-xs text-yellow-400 ml-2">
                           (No se puede desactivar - datos existentes)
@@ -905,7 +905,7 @@ import {
   LogOut,
   HomeIcon,
   Shield,
-  Briefcase,
+  Brain,
   Activity,
   AlertCircle,
 } from "lucide-react"
@@ -1576,7 +1576,7 @@ export default function EditarUsuarioPage() {
                       className="data-[state=checked]:bg-teal-600 data-[state=unchecked]:bg-gray-600"
                     />
                     <Label htmlFor="isPsicologo" className="text-gray-200 flex items-center">
-                      <Briefcase className="w-5 h-5 mr-2 text-teal-400" /> Psicólogo
+                      <Brain className="w-5 h-5 mr-2 text-teal-400" /> Psicólogo
                     </Label>
                   </div>
 
