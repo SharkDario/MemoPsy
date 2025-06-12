@@ -13,7 +13,9 @@ import { UsuarioRepository,
     PerfilTienePermisoRepository, 
     PermisoRepository,
     ModuloRepository,
-    AccionRepository } from '@/repositories/index';
+    AccionRepository,
+  PsicologoRepository,
+PacienteRepository } from '@/repositories/index';
 import { JWT } from 'next-auth/jwt';
 import { initializeDatabase } from '@/lib/database';
 
@@ -23,6 +25,8 @@ declare module 'next-auth' {
     persona: any;
     perfiles: any[];
     permisos: any[];
+    pacienteId?: string | null;
+    psicologoId?: string | null;
   }
 }
 
@@ -149,6 +153,22 @@ export const authConfig: NextAuthOptions = {
           console.log('📊 Resumen final:');
           console.log('- Perfiles:', perfiles.length);
           console.log('- Permisos únicos:', permisosUnicos.length);
+          const pacienteRepository = new PacienteRepository(dataSource);
+          const psicologoRepository = new PsicologoRepository(dataSource);
+
+          const personaId = loginResult.usuario.persona?.id;
+
+          let pacienteId: string | null = null;
+          let psicologoId: string | null = null;
+
+          if (personaId) {
+            const paciente = await pacienteRepository.findByPersonaId(personaId);
+            if (paciente) pacienteId = paciente.id;
+
+            const psicologo = await psicologoRepository.findByPersonaId(personaId);
+            if (psicologo) psicologoId = psicologo.id;
+          }
+
 
           const userResult = {
             id: loginResult.usuario.id,
@@ -156,7 +176,9 @@ export const authConfig: NextAuthOptions = {
             activo: loginResult.usuario.activo,
             persona: loginResult.usuario.persona,
             perfiles: perfiles.map(p => p.perfil || p),
-            permisos: permisosUnicos
+            permisos: permisosUnicos,
+            pacienteId,
+            psicologoId
           };
 
           console.log('✅ Usuario autenticado exitosamente');
@@ -205,10 +227,10 @@ export const authConfig: NextAuthOptions = {
   ],
   session: {
     strategy: 'jwt',
-    maxAge: 24 * 60 * 60, // 24 horas
+    maxAge: 2 * 60 * 60, // 2 horas
   },
   jwt: {
-    maxAge: 24 * 60 * 60, // 24 horas
+    maxAge: 2 * 60 * 60, // 2 horas
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -221,6 +243,8 @@ export const authConfig: NextAuthOptions = {
         token.persona = user.persona;
         token.perfiles = user.perfiles;
         token.permisos = user.permisos;
+        token.pacienteId = user.pacienteId;
+        token.psicologoId = user.psicologoId;
       }
       return token;
     },
@@ -234,6 +258,9 @@ export const authConfig: NextAuthOptions = {
         session.user.persona = token.persona;
         session.user.perfiles = token.perfiles as any[];
         session.user.permisos = token.permisos as any[];
+        session.user.pacienteId = token.pacienteId;
+        session.user.psicologoId = token.psicologoId;
+
       }
       return session;
     }

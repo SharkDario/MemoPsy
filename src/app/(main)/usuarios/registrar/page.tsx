@@ -226,9 +226,13 @@ export default function RegistrarUsuarioPage() {
     }
 
     if (!formData.password) {
-      newErrors.password = "La contraseña es requerida."
-    } else if (formData.password.length < 6) {
-      newErrors.password = "La contraseña debe tener al menos 6 caracteres."
+      newErrors.password = "La contraseña es requerida.";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "La contraseña debe tener al menos 8 caracteres.";
+    } else if (!/[A-Z]/.test(formData.password)) {
+      newErrors.password = "La contraseña debe contener al menos una letra mayúscula.";
+    } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
+      newErrors.password = "La contraseña debe contener al menos un carácter especial.";
     }
 
     if (formData.password !== formData.confirmPassword) {
@@ -517,7 +521,7 @@ export default function RegistrarUsuarioPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="nombre" className="text-gray-200">
-                    Nombre
+                    Nombre *
                   </Label>
                   <Input
                     id="nombre"
@@ -531,7 +535,7 @@ export default function RegistrarUsuarioPage() {
                 </div>
                 <div>
                   <Label htmlFor="apellido" className="text-gray-200">
-                    Apellido
+                    Apellido *
                   </Label>
                   <Input
                     id="apellido"
@@ -547,7 +551,7 @@ export default function RegistrarUsuarioPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="dni" className="text-gray-200">
-                    DNI
+                    DNI *
                   </Label>
                   <Input
                     id="dni"
@@ -562,7 +566,7 @@ export default function RegistrarUsuarioPage() {
                 </div>
                 <div>
                   <Label htmlFor="fecha_nacimiento" className="text-gray-200">
-                    Fecha de Nacimiento
+                    Fecha de Nacimiento *
                   </Label>
                   <Input
                     id="fecha_nacimiento"
@@ -583,7 +587,7 @@ export default function RegistrarUsuarioPage() {
               {/* Account Info */}
               <div>
                 <Label htmlFor="email" className="text-gray-200">
-                  Email
+                  Email *
                 </Label>
                 <Input
                   id="email"
@@ -599,7 +603,7 @@ export default function RegistrarUsuarioPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="password" className="text-gray-200">
-                    Contraseña
+                    Contraseña *
                   </Label>
                   <Input
                     id="password"
@@ -614,7 +618,7 @@ export default function RegistrarUsuarioPage() {
                 </div>
                 <div>
                   <Label htmlFor="confirmPassword" className="text-gray-200">
-                    Confirmar Contraseña
+                    Confirmar Contraseña *
                   </Label>
                   <Input
                     id="confirmPassword"
@@ -644,7 +648,7 @@ export default function RegistrarUsuarioPage() {
                   <div className="pl-8 space-y-4 transition-all duration-300 ease-in-out">
                     <div>
                       <Label htmlFor="numeroLicencia" className="text-gray-300">
-                        Número de Licencia
+                        Número de Licencia *
                       </Label>
                       <Input
                         id="numeroLicencia"
@@ -660,7 +664,7 @@ export default function RegistrarUsuarioPage() {
                     </div>
                     <div>
                       <Label htmlFor="especialidad" className="text-gray-300">
-                        Especialidad
+                        Especialidad *
                       </Label>
                       <Input
                         id="especialidad"
@@ -688,7 +692,7 @@ export default function RegistrarUsuarioPage() {
                   <div className="pl-8 space-y-4 transition-all duration-300 ease-in-out">
                     <div>
                       <Label htmlFor="selectedObraSocialId" className="text-gray-300">
-                        Obra Social
+                        Obra Social *
                       </Label>
                       <Select
                         name="selectedObraSocialId"

@@ -38,7 +38,7 @@ const MODULOS_DISPONIBLES: ModuloConfig[] = [
   {
     id: 'perfiles',
     nombre: 'Perfiles',
-    descripcion: 'Administración de perfiles y roles',
+    descripcion: 'Administración de perfiles',
     icon: Shield,
     ruta: '/perfiles',
     permisosRequeridos: ['Ver Perfiles', 'Registrar Perfil', 'Editar Perfil', 'Eliminar Perfil', 'Asignar Perfil']
@@ -61,7 +61,7 @@ export default function WelcomePage() {
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/auth/login');
+      router.push('/login');
     }
   }, [status, router]);
 
@@ -216,7 +216,7 @@ export default function WelcomePage() {
       <main className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4" style={{ color: '#F1C77A' }}>
-            ¡Bienvenido, {nombreCompleto}!
+            ¡Bienvenida/o, {nombreCompleto}!
           </h1>
           <p className="text-xl text-gray-300">
             Sistema de Gestión MemoPsy
@@ -246,12 +246,21 @@ export default function WelcomePage() {
                   </p>
                   <Button
                     variant="outline"
-                    className="w-full"
-                    style={{ 
-                      borderColor: '#F1C77A',
-                      color: '#F1C77A'
-                    }}
-                  >
+                      className="w-full py-3 text-lg"
+                      style={{ 
+                        borderColor: '#F1C77A',
+                        color: '#F1C77A',
+                        backgroundColor: 'transparent'
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.target as HTMLElement).style.backgroundColor = '#F1C77A';
+                        (e.target as HTMLElement).style.color = '#1D3434';
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.target as HTMLElement).style.backgroundColor = 'transparent';
+                        (e.target as HTMLElement).style.color = '#F1C77A';
+                      }}
+                    >
                     Acceder
                   </Button>
                 </div>
