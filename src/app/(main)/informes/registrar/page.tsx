@@ -178,7 +178,8 @@ export default function RegistrarInformePage() {
   useEffect(() => {
     setFormData(prev => ({
       ...prev,
-      pacientesIds: selectedPacientes.map(p => p.id)
+      //pacientesIds: selectedPacientes.map(p => p.id)
+      pacientesIds: selectedPacientes.map(p => String(p.id)) // Ensure p.id is a string
     }));
   }, [selectedPacientes]);
 
