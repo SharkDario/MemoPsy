@@ -11,10 +11,32 @@ import { PacienteEntity } from '@/entities/paciente.entity';
 import { AppDataSource } from '@/lib/database';
 import { In } from 'typeorm';
 
-async function obtenerFechaDesdeInternet(): Promise<Date> {
-  const res = await fetch('https://worldtimeapi.org/api/ip');
-  const data = await res.json();
-  return new Date(data.utc_datetime); // o data.datetime si prefieres hora local
+//async function obtenerFechaDesdeInternet(): Promise<Date> {
+//  const res = await fetch('https://worldtimeapi.org/api/ip');
+//  const data = await res.json();
+//  return new Date(data.utc_datetime); // o data.datetime si prefieres hora local
+//}
+
+async function obtenerFechaDesdeInternet(retries = 3, delay = 1000): Promise<Date> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const res = await fetch('https://worldtimeapi.org/api/ip');
+      if (!res.ok) {
+        // Manejar errores HTTP (ej. 404, 500)
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const data = await res.json();
+      return new Date(data.utc_datetime);
+    } catch (error) {
+      console.error(`Intento ${i + 1} fallido:`, error);
+      if (i < retries - 1) {
+        await new Promise(resolve => setTimeout(resolve, delay * (i + 1))); // Incrementa el delay
+      } else {
+        throw error; // Lanza el error si todos los reintentos fallan
+      }
+    }
+  }
+  throw new Error('Todos los reintentos para obtener la fecha fallaron.');
 }
 
 export async function GET(request: NextRequest) {
@@ -54,14 +76,26 @@ export async function GET(request: NextRequest) {
 
       if (pacienteId) {
         queryBuilder
-          .innerJoin('informe.pacientesInformes', 'pti', 'pti.paciente_id = :pacienteIdParam', { pacienteIdParam: pacienteId });
+          .innerJoin(PacienteTieneInformeEntity, 'pti', 'pti.informe_id = informe.id')
+          .andWhere('pti.paciente_id = :pacienteIdParam', { pacienteIdParam: pacienteId });
       } else if (pacienteSearch) {
         queryBuilder
+        .innerJoin(PacienteTieneInformeEntity, 'pti', 'pti.informe_id = informe.id')
+        .innerJoin('pti.paciente', 'paciente')
+        .innerJoin('paciente.persona', 'pacientePersona')
+        .andWhere(
+          `(LOWER(pacientePersona.nombre) LIKE LOWER(:query) OR 
+            LOWER(pacientePersona.apellido) LIKE LOWER(:query) OR 
+            pacientePersona.dni LIKE :query)`,
+          { query: `%${pacienteSearch}%` }
+        );
+        // Error aqui puedes cambiar la consulta para que haga el join con "PacienteTieneInforme"
+        /*queryBuilder
           .innerJoin('informe.pacientesInformes', 'pti')
           .leftJoin('pti.paciente', 'paciente')
           .leftJoin('paciente.persona', 'pacientePersona')
           .andWhere('(pacientePersona.nombre LIKE :query OR pacientePersona.apellido LIKE :query OR pacientePersona.dni LIKE :query)', 
-                    { query: `%${pacienteSearch}%` });
+                    { query: `%${pacienteSearch}%` });*/
       }
       
       if (!effectiveSortBy.includes('.')) {
@@ -181,7 +215,12 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ message: 'Psicólogo no encontrado' }, { status: 404 });
     }
 
-    const fechaCreacion = await obtenerFechaDesdeInternet();
+    let fechaCreacion = new Date();
+    //try {
+    //  fechaCreacion = await obtenerFechaDesdeInternet();
+    //} catch {
+    //  fechaCreacion = new Date();
+    //}
 
     const nuevoInforme = informeRepository.create({
       titulo,

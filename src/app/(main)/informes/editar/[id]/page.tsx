@@ -166,7 +166,8 @@ export default function EditarInformePage() {
                     titulo: data.titulo,
                     contenido: data.contenido,
                     esPrivado: data.esPrivado,
-                    pacientesIds: data.pacientes.map(p => p.id),
+                    //pacientesIds: data.pacientes.map(p => p.id),
+                    pacientesIds: data.pacientes.map(p => String(p.id)), // Ensure p.id is a string
                 });
                 setInitialInformeTitle(data.titulo);
                 setSelectedPacientes(data.pacientes.map(p => ({...p, nombreCompleto: `${p.nombre} ${p.apellido}`})));

@@ -20,7 +20,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { TypographyH1, TypographyP, TypographySmall } from '@/components/ui/typography';
 import { 
     ListChecks, Search, Filter, Edit, Eye, FileText as MainModuleIcon, Users, User, Loader2, AlertTriangle, XCircle,
-    Menu, X, LogOut, HomeIcon, Shield, CalendarIcon 
+    Menu, X, LogOut, HomeIcon, Shield, CalendarIcon, Lock, Unlock, PlusCircle 
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
@@ -416,6 +416,8 @@ export default function ListaInformesPage() {
     </TableHead>
   );
 
+  const navigateToRegister = () => router.push("/informes/registrar")
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#152A2A' }}>
       {/* Navbar */}
@@ -436,9 +438,23 @@ export default function ListaInformesPage() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="text-center mb-10">
-          <TypographyH1 className="text-4xl font-bold mb-3">Lista de Informes</TypographyH1>
-          <TypographyP className="text-xl text-gray-300">Consulta y gestiona los informes clínicos.</TypographyP>
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <TypographyH1 className="text-4xl font-bold mb-3">Lista de Informes</TypographyH1>
+              <TypographyP className="text-xl text-gray-300">Consulta y gestiona los informes clínicos.</TypographyP>
+            </div>
+          {userRole === 'psicologo' && (
+            <Button
+              onClick={navigateToRegister}
+              style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}
+              className="flex items-center"
+            >
+              <PlusCircle className="w-5 h-5 mr-2" /> Registrar Nuevo Informe
+            </Button>
+          )}
+          </div>
         </div>
+        
 
         {userRole === 'psicologo' && (
           <Card className="mb-6" style={{ backgroundColor: '#1D3434', borderColor: '#2A4A4A' }}>
@@ -550,7 +566,7 @@ export default function ListaInformesPage() {
                         {userRole === 'paciente' && (
                           <TableCell className="text-gray-300">{informe.psicologo?.nombre || 'N/A'}</TableCell>
                         )}
-                        <TableCell>{informe.esPrivado ? <Badge className="bg-red-700 hover:bg-red-600 text-white">Sí</Badge> : <Badge className="bg-green-700 hover:bg-green-600 text-white">No</Badge>}</TableCell>
+                        <TableCell>{informe.esPrivado ? <Lock className="mr-2 h-5 w-5 text-red-500" /> : <Unlock className="mr-2 h-5 w-5 text-green-500"/>}</TableCell>
                         <TableCell className="text-right space-x-1 pr-2">
                           <Button variant="ghost" size="icon" onClick={() => router.push(`/informes/detalle/${informe.id}`)} title="Ver Detalle" className="text-sky-400 hover:text-sky-300">
                             <Eye className="h-5 w-5" />
