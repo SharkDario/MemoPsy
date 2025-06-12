@@ -1,4 +1,5 @@
 //src/app/(main)/registrar/page.tsx
+//src/app/(main)/registrar/page.tsx
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -174,6 +175,14 @@ export default function RegistrarInformePage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [popoverRef]);
 
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      pacientesIds: selectedPacientes.map(p => p.id)
+    }));
+  }, [selectedPacientes]);
+
+
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const navigateToModule = (ruta: string) => { router.push(ruta); setIsMenuOpen(false); };
   const handleLogout = async () => { await signOut({ redirect: true, callbackUrl: '/login' }); };
@@ -197,9 +206,14 @@ export default function RegistrarInformePage() {
       setFormData(prev => ({ ...prev, pacientesIds: newSelectedPacientes.map(p => p.id) }));
       if (formErrors.pacientesIds) setFormErrors(prev => ({ ...prev, pacientesIds: undefined }));
     }
-    setPacienteSearchQuery('');
-    setPacienteSearchResults([]);
-    setIsPacientePopoverOpen(false);
+    // setPacienteSearchQuery(''); // Keep search query
+    // setPacienteSearchResults([]); // Keep search results visible
+    // setIsPacientePopoverOpen(false); // Keep popover open for further selections
+    
+    // Optional: You might want to clear the search query if the user should perform a new search for each new patient.
+    // If so, just keep setPacienteSearchQuery(''); and setPacienteSearchResults([]);
+    // For now, let's keep it open and results visible to allow multiple selections from the same list.
+    // The existing useEffect for handleClickOutside should handle closing when clicking away.
   };
 
   const handleRemovePaciente = (pacienteId: string) => {
@@ -386,52 +400,83 @@ export default function RegistrarInformePage() {
 
               <div className="space-y-2">
                 <Label htmlFor="pacienteSearch" className="text-gray-200">Pacientes Asociados</Label>
-                <div ref={popoverRef}>
-                  <Popover open={isPacientePopoverOpen} onOpenChange={setIsPacientePopoverOpen}>
-                    <PopoverTrigger asChild>
-                      <div className="relative">
-                        <Input
-                          id="pacienteSearch" type="text"
-                          placeholder="Buscar paciente por nombre, apellido o DNI..."
-                          value={pacienteSearchQuery}
-                          onChange={(e) => { setPacienteSearchQuery(e.target.value); if (!isPacientePopoverOpen && e.target.value.length > 1) setIsPacientePopoverOpen(true); }}
-                          onFocus={() => { if (pacienteSearchQuery.length > 1 && pacienteSearchResults.length > 0) setIsPacientePopoverOpen(true); }}
-                          className={cn("bg-[#152A2A] text-white border-gray-600 focus:border-[#F1C77A] pr-10", formErrors.pacientesIds && "border-red-500")}
-                        />
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                      </div>
-                    </PopoverTrigger>
-                    {isPacientePopoverOpen && (pacienteSearchResults.length > 0 || isPacienteSearchLoading) && (
-                      <PopoverContent className="w-[--radix-popover-trigger-width] p-0 bg-[#1D3434] border-gray-600 text-white">
-                        {isPacienteSearchLoading && <div className="p-4 text-center text-sm text-gray-400">Buscando...</div>}
-                        {!isPacienteSearchLoading && pacienteSearchResults.length === 0 && pacienteSearchQuery.length > 1 && <div className="p-4 text-center text-sm text-gray-400">No se encontraron pacientes.</div>}
-                        {!isPacienteSearchLoading && pacienteSearchResults.length > 0 && (
-                          <ul className="max-h-60 overflow-y-auto">
-                            {pacienteSearchResults.map(paciente => (
-                              <li key={paciente.id} onClick={() => handleSelectPaciente(paciente)}
-                                className="p-3 hover:bg-[#152A2A] cursor-pointer text-sm border-b border-gray-700 last:border-b-0">
-                                {paciente.nombreCompleto} (DNI: {paciente.persona?.dni || 'N/A'})
-                              </li>
-                            ))}
-                          </ul>
+
+                <div className={cn(
+                  "min-h-10 p-2 rounded-md border bg-[#152A2A] text-white w-full",
+                  formErrors.pacientesIds ? "border-red-500" : "border-gray-600"
+                )}>
+                  {/* Selected Pacientes */}
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {selectedPacientes.map(paciente => (
+                      <Badge key={paciente.id} className="bg-[#F1C77A] text-[#1D3434] hover:bg-[#e0b66e] text-sm font-medium">
+                        {paciente.persona?.nombreCompleto || paciente.nombreCompleto}
+                        <button
+                          type="button"
+                          className="ml-1 rounded-full outline-none"
+                          onClick={() => handleRemovePaciente(paciente.id)}
+                        >
+                          <X className="h-3 w-3 text-[#1D3434] hover:text-red-500" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+
+                  {/* Search input + dropdown */}
+                  <div className="relative">
+                    <Input
+                      id="pacienteSearch"
+                      type="text"
+                      placeholder="Buscar paciente por nombre, apellido o DNI..."
+                      value={pacienteSearchQuery}
+                      onChange={(e) => {
+                        setPacienteSearchQuery(e.target.value)
+                        if (!isPacientePopoverOpen && e.target.value.length > 1) {
+                          setIsPacientePopoverOpen(true)
+                        }
+                      }}
+                      onFocus={() => {
+                        if (pacienteSearchQuery.length > 1) setIsPacientePopoverOpen(true)
+                      }}
+                      className="bg-transparent border-0 text-white placeholder:text-gray-400 focus:ring-0 focus:outline-none p-0 w-full"
+                    />
+
+                    {isPacientePopoverOpen && (
+                      <div className="absolute z-50 w-full mt-1 bg-[#1D3434] border border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
+                        {isPacienteSearchLoading ? (
+                          <div className="p-4 text-center text-sm text-gray-400">Buscando...</div>
+                        ) : pacienteSearchResults.length > 0 ? (
+                          pacienteSearchResults.map((paciente) => (
+                            <div
+                              key={paciente.id}
+                              className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#152A2A] text-white border-b border-gray-700 last:border-b-0"
+                              onClick={() => handleSelectPaciente(paciente)}
+                            >
+                              <Check
+                                className={cn(
+                                  "h-4 w-4",
+                                  selectedPacientes.some(p => p.id === paciente.id) ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              <span>{paciente.persona?.nombreCompleto || paciente.nombreCompleto} (DNI: {paciente.persona?.dni || 'N/A'})</span>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="p-4 text-center text-sm text-gray-400">
+                            {pacienteSearchQuery.length > 1
+                              ? "No se encontraron pacientes."
+                              : "Escribe para buscar pacientes"}
+                          </div>
                         )}
-                      </PopoverContent>
+                      </div>
                     )}
-                  </Popover>
+                  </div>
                 </div>
-                {formErrors.pacientesIds && <TypographySmall className="text-red-400">{formErrors.pacientesIds}</TypographySmall>}
-                <div className="mt-3 space-x-2 space-y-2">
-                  {selectedPacientes.map(paciente => (
-                    <Badge key={paciente.id} className="bg-[#F1C77A] text-[#1D3434] hover:bg-[#e0b66e] text-sm font-medium">
-                      {paciente.nombreCompleto}
-                      <Button type="button" variant="ghost" size="icon" onClick={() => handleRemovePaciente(paciente.id)}
-                        className="ml-1.5 p-0 h-4 w-4 text-[#1D3434] hover:bg-transparent hover:text-red-500">
-                        <X className="h-3.5 w-3.5" />
-                      </Button>
-                    </Badge>
-                  ))}
-                </div>
+
+                {formErrors.pacientesIds && (
+                  <TypographySmall className="text-red-400">{formErrors.pacientesIds}</TypographySmall>
+                )}
               </div>
+
             </CardContent>
             <CardFooter className="flex justify-end space-x-3 pt-6 border-t border-gray-700 mt-6">
               <Button type="button" variant="outline" onClick={() => router.push('/informes')}

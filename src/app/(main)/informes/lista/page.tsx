@@ -1,4 +1,5 @@
 //src/app/(main)/informes/lista/page.tsx
+//src/app/(main)/informes/lista/page.tsx
 "use client";
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
@@ -32,9 +33,12 @@ interface Informe {
   pacientes?: Array<{ id: string; nombre: string; dni?: string }>;
 }
 
-interface PacienteInfo { 
+interface PacienteInfo {
   id: string;
   nombreCompleto: string;
+  persona?: { // Make persona optional in case API response structure varies or for robustness
+    dni?: string;
+  };
 }
 
 interface PaginationState {
@@ -139,8 +143,12 @@ export default function ListaInformesPage() {
       const response = await fetch(`/api/pacientes/buscar?q=${encodeURIComponent(query)}&limit=5`);
       if (!response.ok) throw new Error('Error buscando pacientes');
       const data = await response.json();
-      setPacienteSearchResults((data.data || data).map((p: any) => ({ id: p.id, nombreCompleto: `${p.persona.nombre} ${p.persona.apellido}` })));
-    } catch (e) { console.error(e); setPacienteSearchResults([]); } 
+      setPacienteSearchResults((data.data || data).map((p: any) => ({
+        id: p.id,
+        nombreCompleto: p.persona?.nombreCompleto || `${p.persona?.nombre || ''} ${p.persona?.apellido || ''}`, // Ensure nombreCompleto is still populated
+        persona: p.persona ? { dni: p.persona.dni } : undefined
+      })));
+    } catch (e) { console.error(e); setPacienteSearchResults([]); }
     finally { setIsPacienteSearchLoading(false); }
   };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -401,37 +409,56 @@ export default function ListaInformesPage() {
               <CardTitle className="flex items-center text-[#F1C77A]"><Filter className="mr-2 h-5 w-5" /> Filtros de Búsqueda</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 md:space-y-0 md:flex md:space-x-4 md:items-end">
-              <div className="relative flex-grow" ref={pacienteSearchPopoverRef}>
+              <div className="relative flex-grow" ref={pacienteSearchPopoverRef}> {/* Keep ref for click outside if still needed, though Popover might handle some of this */}
                 <Label htmlFor="pacienteSearchInput" className="text-gray-200">Buscar por Paciente (Nombre/DNI)</Label>
-                <div className="relative">
-                    <Input
-                        id="pacienteSearchInput" placeholder="Escriba para buscar paciente..." value={pacienteSearchInput}
-                        onChange={(e) => {setPacienteSearchInput(e.target.value); if(e.target.value.length > 1 && !isPacienteSearchPopoverOpen) setIsPacienteSearchPopoverOpen(true);}}
-                        onFocus={() => {if(pacienteSearchInput.length > 1 && pacienteSearchResults.length > 0) setIsPacienteSearchPopoverOpen(true);}}
+                <Popover open={isPacienteSearchPopoverOpen} onOpenChange={setIsPacienteSearchPopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <div className="relative">
+                      <Input
+                        id="pacienteSearchInput"
+                        placeholder="Escriba para buscar paciente..."
+                        value={pacienteSearchInput}
+                        onChange={(e) => {
+                          setPacienteSearchInput(e.target.value);
+                          if (e.target.value.length > 1) {
+                            setIsPacienteSearchPopoverOpen(true);
+                          } else {
+                            setIsPacienteSearchPopoverOpen(false); // Close if query is too short
+                          }
+                        }}
+                        // Removed onFocus logic that manually sets popover open, PopoverTrigger handles clicks/focus.
+                        // Consider if onFocus is still needed for a specific UX, but default PopoverTrigger behavior is usually sufficient.
                         className="bg-[#152A2A] text-white border-gray-600 focus:border-[#F1C77A] pr-10"
-                    />
-                    {pacienteSearchInput && (
-                        <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 p-1 h-auto text-gray-400 hover:text-white" onClick={clearPacienteFilter}>
-                        <XCircle className="h-5 w-5" />
+                      />
+                      {pacienteSearchInput && (
+                        <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 p-1 h-auto text-gray-400 hover:text-white" onClick={(e) => { clearPacienteFilter(); e.stopPropagation(); /* Prevent popover from reopening */ }}>
+                          <XCircle className="h-5 w-5" />
                         </Button>
-                    )}
-                </div>
+                      )}
+                      {/* The Search icon can be inside or outside PopoverTrigger depending on design, but it's not interactive for opening popover */}
+                    </div>
+                  </PopoverTrigger>
+                  {/* Conditional rendering of PopoverContent's content is fine, but PopoverContent itself should be structured correctly */}
+                  {(pacienteSearchResults.length > 0 || (pacienteSearchInput.length > 1 && !isPacienteSearchLoading)) && ( // This condition can now simply be on open state
+                      <PopoverContent className="w-[--radix-popover-trigger-width] p-0 bg-[#1D3434] border-gray-600 text-white mt-1">
+                          {isPacienteSearchLoading && <div className="p-4 text-center text-sm text-gray-400">Buscando...</div>}
+                          {!isPacienteSearchLoading && pacienteSearchResults.length === 0 && pacienteSearchInput.length > 1 && <div className="p-4 text-center text-sm text-gray-400">No se encontraron pacientes.</div>}
+                          {!isPacienteSearchLoading && pacienteSearchResults.length > 0 && (
+                          <ul className="max-h-60 overflow-y-auto">
+                              {pacienteSearchResults.map(p => (
+                              <li key={p.id} onClick={() => handlePacienteFilterSelect(p)} className="p-3 hover:bg-[#152A2A] cursor-pointer text-sm border-b border-gray-700 last:border-b-0">
+                                  {p.nombreCompleto} (DNI: {p.persona?.dni || 'N/A'})
+                              </li>
+                              ))}
+                          </ul>
+                          )}
+                      </PopoverContent>
+                  )}
+                </Popover>
+                {/* The Loader2 for search loading might need repositioning or to be part of PopoverContent if it's only shown when popover is open */}
+                {/* For instance, if isPacienteSearchLoading is true AND isPacienteSearchPopoverOpen is true, show loader inside PopoverContent */}
+                {/* Or, keep it outside if it should be visible even if popover content has no results yet but is open. The current placement is fine. */}
                 {isPacienteSearchLoading && <Loader2 className="absolute right-10 top-[38px] h-5 w-5 animate-spin text-gray-400" />}
-                {isPacienteSearchPopoverOpen && (pacienteSearchResults.length > 0 || (pacienteSearchInput.length > 1 && !isPacienteSearchLoading)) && (
-                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0 bg-[#1D3434] border-gray-600 text-white mt-1">
-                        {isPacienteSearchLoading && <div className="p-4 text-center text-sm text-gray-400">Buscando...</div>}
-                        {!isPacienteSearchLoading && pacienteSearchResults.length === 0 && pacienteSearchInput.length > 1 && <div className="p-4 text-center text-sm text-gray-400">No se encontraron pacientes.</div>}
-                        {!isPacienteSearchLoading && pacienteSearchResults.length > 0 && (
-                        <ul className="max-h-60 overflow-y-auto">
-                            {pacienteSearchResults.map(p => (
-                            <li key={p.id} onClick={() => handlePacienteFilterSelect(p)} className="p-3 hover:bg-[#152A2A] cursor-pointer text-sm border-b border-gray-700 last:border-b-0">
-                                {p.nombreCompleto}
-                            </li>
-                            ))}
-                        </ul>
-                        )}
-                    </PopoverContent>
-                )}
               </div>
               <Button onClick={handleApplyGeneralSearch} className="bg-[#F1C77A] text-[#1D3434] hover:bg-opacity-80 w-full md:w-auto">
                 <Search className="mr-2 h-4 w-4" /> Aplicar Búsqueda
@@ -474,8 +501,12 @@ export default function ListaInformesPage() {
                         <TableCell className="text-gray-300">{new Date(informe.fechaCreacion).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}</TableCell>
                         {userRole === 'psicologo' && (
                           <TableCell>
-                            {informe.pacientes && informe.pacientes.length > 0 
-                              ? informe.pacientes.map(p => <Badge key={p.id} className="mr-1 mb-1 bg-teal-600 hover:bg-teal-500 text-white text-xs">{p.nombre}</Badge>) 
+                            {informe.pacientes && informe.pacientes.length > 0
+                              ? informe.pacientes.map(p => (
+                                  <Badge key={p.id} className="mr-1 mb-1 bg-teal-600 hover:bg-teal-500 text-white text-xs">
+                                    {p.nombre} (DNI: {p.dni || 'N/A'})
+                                  </Badge>
+                                ))
                               : <TypographySmall className="text-gray-500">N/A</TypographySmall>}
                           </TableCell>
                         )}

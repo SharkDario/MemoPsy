@@ -10,6 +10,12 @@ import { PacienteEntity } from '@/entities/paciente.entity';
 import { AppDataSource } from '@/lib/database';
 import { In } from 'typeorm';
 
+async function obtenerFechaDesdeInternet(): Promise<Date> {
+  const res = await fetch('https://worldtimeapi.org/api/ip');
+  const data = await res.json();
+  return new Date(data.utc_datetime); // o data.datetime si prefieres hora local
+}
+
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authConfig);
@@ -17,7 +23,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
     }
 
-    const hasPermission = session.user.permisos?.includes('Ver Informes');
+    const hasPermission = session.user.permisos?.some((permiso) => permiso.nombre === 'Ver Informes');
     if (!hasPermission) {
       return NextResponse.json({ message: 'Acceso denegado' }, { status: 403 });
     }
@@ -127,9 +133,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
     }
 
-    const hasPermission = session.user.permisos?.includes('Registrar Informe');
+    const hasPermission = session.user.permisos?.some((permiso) => permiso.nombre === 'Registrar Informe');;
     if (!hasPermission || !session.user.psicologoId) {
-      return NextResponse.json({ message: 'Acceso denegado o rol no válido' }, { status: 403 });
+      return NextResponse.json({ message: 'Acceso denegado' }, { status: 403 });
     }
 
     const body = await request.json();
@@ -156,11 +162,13 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ message: 'Psicólogo no encontrado' }, { status: 404 });
     }
 
+    const fechaCreacion = await obtenerFechaDesdeInternet();
+
     const nuevoInforme = informeRepository.create({
       titulo,
       contenido,
       esPrivado,
-      fechaCreacion: new Date(),
+      fechaCreacion: fechaCreacion,
       psicologo: psicologo,
     });
 

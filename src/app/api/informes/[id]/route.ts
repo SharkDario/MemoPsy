@@ -55,8 +55,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     // For now, assuming array of strings as in other route files.
     const userPermissions = user.permisos || [];
 
-
-    if (!userPermissions.includes("Ver Informes")) {
+    const hasPermission = userPermissions.some((permiso) => permiso.nombre === "Ver Informes");
+    if (!hasPermission) {
       return NextResponse.json({ message: "No tiene permisos para ver informes" }, { status: 403 });
     }
 
@@ -115,7 +115,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ message: 'No autorizado o rol no válido' }, { status: 401 });
     }
 
-    const hasPermission = session.user.permisos?.includes('Editar Informe');
+    const hasPermission = session.user.permisos?.some((permiso) => permiso.nombre === 'Editar Informe');
     if (!hasPermission) {
       return NextResponse.json({ message: 'Acceso denegado: Permiso "Editar Informe" requerido' }, { status: 403 });
     }
