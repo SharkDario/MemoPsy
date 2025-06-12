@@ -1,5 +1,6 @@
 //src/app/(main)/informes/lista/page.tsx
 //src/app/(main)/informes/lista/page.tsx
+//src/app/(main)/informes/lista/page.tsx
 "use client";
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
@@ -181,15 +182,18 @@ export default function ListaInformesPage() {
     params.set('sortOrder', sorting.sortOrder);
 
     if (userRole === 'psicologo') {
+        // Remove old/potentially conflicting params first
+        params.delete('paciente'); 
+        params.delete('pacienteId');
+        params.delete('pacienteSearch');
+
         if (selectedPacienteFilter) {
-            params.set('paciente', selectedPacienteFilter.id); 
-            params.set('pacienteSearch', selectedPacienteFilter.nombreCompleto); // Store name for display consistency
-        } else if (filters.pacienteQuery) {
+            params.set('pacienteId', selectedPacienteFilter.id);
+            // To make sure the search input shows the selected patient's name upon reload:
+            // Also, this ensures that if a user reloads, the search input is pre-filled.
+            params.set('pacienteSearch', selectedPacienteFilter.nombreCompleto);
+        } else if (filters.pacienteQuery) { // General text search
             params.set('pacienteSearch', filters.pacienteQuery);
-            params.delete('paciente'); // Ensure no specific ID is sent if using general search
-        } else {
-            params.delete('paciente');
-            params.delete('pacienteSearch');
         }
     }
     router.replace(`/informes/lista?${params.toString()}`, { scroll: false });
@@ -209,9 +213,12 @@ export default function ListaInformesPage() {
 
     if (userRole === 'psicologo') {
         if (selectedPacienteFilter) {
-            params.append('paciente', selectedPacienteFilter.id);
+            params.append('pacienteId', selectedPacienteFilter.id);
+            // No need to append pacienteSearch here for filtering, 
+            // as pacienteId takes precedence on the backend.
+            // pacienteSearch is mainly for restoring input field text via URL.
         } else if (filters.pacienteQuery) {
-            params.append('paciente', filters.pacienteQuery);
+            params.append('pacienteSearch', filters.pacienteQuery);
         }
     }
 
@@ -244,11 +251,41 @@ export default function ListaInformesPage() {
       const canViewPage = userPermisos.includes('Ver Informes');
       setHasPermissionToViewPage(canViewPage);
       
+      let currentRole: 'psicologo' | 'paciente' | null = null;
       if(canViewPage){
         setCanEditInforme(userPermisos.includes('Editar Informe') && !!session.user.psicologoId);
-        if (session.user.psicologoId) setUserRole('psicologo');
-        else if (session.user.pacienteId) setUserRole('paciente');
+        if (session.user.psicologoId) {
+          setUserRole('psicologo');
+          currentRole = 'psicologo';
+        } else if (session.user.pacienteId) {
+          setUserRole('paciente');
+          currentRole = 'paciente';
+        }
       }
+
+      // Initialize filters from URL params after role is determined
+      const initialPacienteId = searchParams.get('pacienteId');
+      const initialPacienteSearch = searchParams.get('pacienteSearch');
+
+      if (currentRole === 'psicologo') {
+        if (initialPacienteId && initialPacienteSearch) {
+          // If we have both an ID and a search term (presumably the name for that ID)
+          setSelectedPacienteFilter({ id: initialPacienteId, nombreCompleto: initialPacienteSearch });
+          setPacienteSearchInput(initialPacienteSearch); // Set the input field text
+          setFilters(prev => ({ ...prev, pacienteQuery: initialPacienteSearch }));
+        } else if (initialPacienteSearch) {
+          // Only a general search term is present, not a selected patient
+          setPacienteSearchInput(initialPacienteSearch);
+          setFilters(prev => ({ ...prev, pacienteQuery: initialPacienteSearch }));
+          setSelectedPacienteFilter(null); // Ensure no specific patient is selected
+        } else {
+          // No patient search parameters, clear relevant states
+           setPacienteSearchInput('');
+           setFilters(prev => ({ ...prev, pacienteQuery: '' }));
+           setSelectedPacienteFilter(null);
+        }
+      }
+
 
       // Navbar permissions
       const filteredMainModules = MODULOS_DISPONIBLES.filter(module =>

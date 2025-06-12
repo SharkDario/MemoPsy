@@ -1,4 +1,5 @@
 // src/app/api/informes/route.ts
+// src/app/api/informes/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authConfig } from '@/lib/auth/auth-config';
@@ -37,8 +38,9 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || '10', 10);
-    const pacienteQuery = searchParams.get('paciente'); // Name or DNI
-    const sortBy = searchParams.get('sortBy') || 'informe.fechaCreacion'; // Default sort column
+    const pacienteId = searchParams.get('pacienteId');
+    const pacienteSearch = searchParams.get('pacienteSearch');
+    let effectiveSortBy = searchParams.get('sortBy') || 'informe.fechaCreacion'; // Default sort column
     const sortOrder = searchParams.get('sortOrder')?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'; // Default sort order
 
     let informesData: any[] = [];
@@ -50,15 +52,22 @@ export async function GET(request: NextRequest) {
         .leftJoinAndSelect('psicologo.persona', 'psicologoPersona')
         .where('informe.psicologo_id = :psicologoId', { psicologoId: session.user.psicologoId });
 
-      if (pacienteQuery) {
-        queryBuilder.leftJoin('informe.pacientesInformes', 'pti')
-                    .leftJoin('pti.paciente', 'paciente')
-                    .leftJoin('paciente.persona', 'pacientePersona')
-                    .andWhere('(pacientePersona.nombre LIKE :query OR pacientePersona.apellido LIKE :query OR pacientePersona.dni LIKE :query)', 
-                              { query: `%${pacienteQuery}%` });
+      if (pacienteId) {
+        queryBuilder
+          .innerJoin('informe.pacientesInformes', 'pti', 'pti.paciente_id = :pacienteIdParam', { pacienteIdParam: pacienteId });
+      } else if (pacienteSearch) {
+        queryBuilder
+          .innerJoin('informe.pacientesInformes', 'pti')
+          .leftJoin('pti.paciente', 'paciente')
+          .leftJoin('paciente.persona', 'pacientePersona')
+          .andWhere('(pacientePersona.nombre LIKE :query OR pacientePersona.apellido LIKE :query OR pacientePersona.dni LIKE :query)', 
+                    { query: `%${pacienteSearch}%` });
       }
       
-      queryBuilder.orderBy(sortBy, sortOrder as 'ASC' | 'DESC');
+      if (!effectiveSortBy.includes('.')) {
+        effectiveSortBy = `informe.${effectiveSortBy}`;
+      }
+      queryBuilder.orderBy(effectiveSortBy, sortOrder as 'ASC' | 'DESC');
       
       totalInformes = await queryBuilder.getCount();
       const informes = await queryBuilder.skip((page - 1) * limit).take(limit).getMany();
@@ -91,10 +100,20 @@ export async function GET(request: NextRequest) {
         .where('pti.paciente_id = :pacienteId', { pacienteId: session.user.pacienteId })
         .andWhere('informe.esPrivado = :esPrivado', { esPrivado: false });
 
-      if (sortBy.startsWith('informe.')) { // Ensure sorting is on informe table
-          ptiQueryBuilder.orderBy(sortBy, sortOrder as 'ASC' | 'DESC');
+      // For patient, effectiveSortBy might be 'fechaCreacion' (intended for informe) or 'informe.fechaCreacion'
+      if (effectiveSortBy.startsWith('informe.')) {
+          ptiQueryBuilder.orderBy(effectiveSortBy, sortOrder as 'ASC' | 'DESC');
       } else {
-          ptiQueryBuilder.orderBy('informe.fechaCreacion', 'DESC'); // Default for paciente
+          // If effectiveSortBy is a simple column name like 'fechaCreacion', it's for the 'informe' table.
+          // Or if it's something not recognized, default to 'informe.fechaCreacion'.
+          // This also handles the default 'informe.fechaCreacion' if sortBy was initially null.
+          const patientSortColumn = effectiveSortBy.includes('.') ? 'informe.fechaCreacion' : `informe.${effectiveSortBy}`;
+          const patientSortOrder = effectiveSortBy.includes('.') ? 'DESC' : sortOrder; // keep original order if simple column
+          ptiQueryBuilder.orderBy(patientSortColumn, patientSortOrder as 'ASC' | 'DESC');
+          // If default was used due to unrecognized column, ensure DESC for fechaCreacion
+          if (patientSortColumn === 'informe.fechaCreacion' && !effectiveSortBy.startsWith('informe.')) {
+             ptiQueryBuilder.orderBy('informe.fechaCreacion', 'DESC');
+          }
       }
       
       totalInformes = await ptiQueryBuilder.getCount();
