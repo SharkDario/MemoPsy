@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import { TypographyP } from '@/components/ui/typography';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import {
   Menu,
@@ -26,6 +27,7 @@ import {
   PlusCircle,
   Eye,
   User,
+  Loader2,
 } from "lucide-react"
 
 interface ModuloConfig {
@@ -242,8 +244,9 @@ export default function ListarPerfilesPage() {
 
   if (status === "loading" && isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: "#152A2A" }}>
-        <div className="text-white text-lg">Cargando...</div>
+      <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: '#152A2A' }}>
+                  <Loader2 className="h-16 w-16 animate-spin text-[#F1C77A] mb-4" />
+                  <TypographyP className="text-white">Cargando...</TypographyP>
       </div>
     )
   }

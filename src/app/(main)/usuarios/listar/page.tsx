@@ -9,8 +9,10 @@ import { Input } from "@/components/ui/input"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
+import { TypographyP } from '@/components/ui/typography';
 import {
   Menu,
+  Loader2,
   X,
   Users,
   Calendar,
@@ -381,7 +383,10 @@ export default function ListarUsuariosPage() {
         </div>
 
         {isLoading && userActionPermissions.canView ? (
-          <div className="text-center text-gray-300 py-10">Cargando usuarios...</div>
+          <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: '#152A2A' }}>
+            <Loader2 className="h-16 w-16 animate-spin text-[#F1C77A] mb-4" />
+            <TypographyP className="text-white">Cargando...</TypographyP>
+          </div>
         ) : error ? (
           <div className="text-center text-red-400 py-10 bg-red-900 bg-opacity-30 p-4 rounded-md">
             <AlertCircle className="w-8 h-8 mx-auto mb-2" /> {error}

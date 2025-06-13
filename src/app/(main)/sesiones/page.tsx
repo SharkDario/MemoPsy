@@ -20,8 +20,10 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar } from "@/components/ui/calendar"
 import { Badge } from "@/components/ui/badge"
+import { TypographyP } from '@/components/ui/typography';
 import {
   Menu,
+  Loader2,
   X,
   CalendarIcon,
   Plus,
@@ -800,9 +802,10 @@ const handleUpdateSesion = async () => {
 
   if (status === "loading" || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: "#152A2A" }}>
-        <div className="text-white text-lg">Cargando...</div>
-      </div>
+      <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: '#152A2A' }}>
+            <Loader2 className="h-16 w-16 animate-spin text-[#F1C77A] mb-4" />
+            <TypographyP className="text-white">Cargando...</TypographyP>
+        </div>
     )
   }
 

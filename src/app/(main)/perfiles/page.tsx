@@ -5,7 +5,8 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import MemopsyLogo from "@/app/components/MemopsyLogo";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Users, UserPlus, List, Edit3, Shield, LogOut, FileText, Calendar, HomeIcon } from 'lucide-react'; // Added ShieldPlus, Settings2
+import { TypographyP } from '@/components/ui/typography';
+import { Menu, Loader2, X, Users, UserPlus, List, Edit3, Shield, LogOut, FileText, Calendar, HomeIcon } from 'lucide-react'; // Added ShieldPlus, Settings2
 
 interface SubModuloConfig {
   id: string;
@@ -141,9 +142,10 @@ export default function PerfilesPage() {
 
   if (status === 'loading') {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#152A2A' }}>
-        <div className="text-white text-lg">Cargando...</div>
-      </div>
+      <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: '#152A2A' }}>
+            <Loader2 className="h-16 w-16 animate-spin text-[#F1C77A] mb-4" />
+            <TypographyP className="text-white">Cargando...</TypographyP>
+        </div>
     );
   }
 
