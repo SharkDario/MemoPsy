@@ -85,8 +85,17 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    if (password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres.');
+    if (!password) {
+      setError("La contraseña es requerida.");
+      return;
+    } else if (password.length < 8) {
+      setError("La contraseña debe tener al menos 8 caracteres.");
+      return;
+    } else if (!/[A-Z]/.test(password)) {
+      setError("La contraseña debe contener al menos una letra mayúscula.");
+      return;
+    } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      setError("La contraseña debe contener al menos un carácter especial.");
       return;
     }
 

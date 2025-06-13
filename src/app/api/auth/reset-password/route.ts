@@ -1,101 +1,50 @@
 // app/api/auth/reset-password/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { UsuarioService } from '@/services';
-import { UsuarioRepository, PersonaRepository } from '@/repositories';
-import { AppDataSource } from '@/lib/database';
-import { ChangePasswordDto } from '@/dto/usuario.dto';
-import * as bcrypt from "bcrypt";
-import App from 'next/app';
-// Importa tu servicio/repositorio de Usuario aquí
-// import { UsuarioService } from '@/services/UsuarioService';
+import { NextResponse } from "next/server"
+import { getRepository } from "@/lib/database"
+import { UsuarioEntity } from "@/entities"
+import * as bcrypt from "bcrypt"
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    // Comprobar si la conexión ya está inicializada
-    if (!AppDataSource.isInitialized) {
-      await AppDataSource.initialize();
-    }
-    const { email, newPassword, timestamp, expires } = await request.json();
+    const { email, newPassword, timestamp, expires } = await request.json()
 
-    // Validar que todos los campos estén presentes
+    // Validar que todos los campos requeridos estén presentes
     if (!email || !newPassword || !timestamp || !expires) {
-      return NextResponse.json(
-        { message: 'Faltan datos requeridos' },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Todos los campos son requeridos" }, { status: 400 })
     }
 
     // Verificar que el enlace no haya expirado
-    const currentTime = Date.now();
-    const expirationTime = parseInt(expires);
-    
+    const currentTime = Date.now()
+    const expirationTime = Number.parseInt(expires)
+
     if (currentTime > expirationTime) {
-      return NextResponse.json(
-        { message: 'El enlace de recuperación ha expirado' },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "El enlace ha expirado" }, { status: 400 })
     }
 
-    // Validar longitud de contraseña
-    if (newPassword.length < 8) {
-      return NextResponse.json(
-        { message: 'La contraseña debe tener al menos 8 caracteres' },
-        { status: 400 }
-      );
-    }
+    // Buscar al usuario por email usando TypeORM
+    const usuarioRepo = await getRepository(UsuarioEntity)
+    const usuario = await usuarioRepo.findOne({
+      where: { email },
+    })
 
-    // Aquí deberías:
-    // 1. Buscar el usuario por email
-    // 2. Hashear la nueva contraseña
-    // 3. Actualizar la contraseña en la base de datos
-    // 4. Actualizar el ultimoAcceso si es necesario
-    const usuarioRepository = new UsuarioRepository(AppDataSource);
-    const personaRepository = new PersonaRepository(AppDataSource);
-
-    const usuarioService = new UsuarioService(usuarioRepository, personaRepository);
-    
-    // Buscar usuario
-    const usuario = await usuarioService.getUsuarioByEmail(email);
     if (!usuario) {
-      return NextResponse.json(
-        { message: 'Usuario no encontrado' },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "Usuario no encontrado" }, { status: 404 })
     }
 
-    // Hashear nueva contraseña
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+    // Hashear la nueva contraseña
+    const hashedPassword = await bcrypt.hash(newPassword, 10)
 
-    // Actualizar contraseña
-    const changePasswordDto = new ChangePasswordDto();
-    changePasswordDto.newPassword = hashedPassword;
-    //usuario.password = hashedPassword;
-    //usuario.ultimoAcceso = new Date();
-    
-    await usuarioService.changePassword(usuario.id, changePasswordDto);
-    
+    // Actualizar la contraseña del usuario
+    usuario.password = hashedPassword
+    usuario.ultimoAcceso = new Date() // Actualizar la fecha de último acceso
 
-    // actualización exitosa
-    console.log(`Actualizando contraseña para usuario: ${email}`);
-    console.log(`Timestamp: ${timestamp}, Expires: ${expires}`);
-    
-    // Simular delay de base de datos
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await usuarioRepo.save(usuario)
 
-    return NextResponse.json(
-      { 
-        message: 'Contraseña actualizada exitosamente',
-        success: true 
-      },
-      { status: 200 }
-    );
-
+    return NextResponse.json({
+      message: "Contraseña actualizada exitosamente",
+    })
   } catch (error) {
-    console.error('Error resetting password:', error);
-    return NextResponse.json(
-      { message: 'Error interno del servidor' },
-      { status: 500 }
-    );
+    console.error("Error al actualizar contraseña:", error)
+    return NextResponse.json({ message: "Error interno del servidor" }, { status: 500 })
   }
 }

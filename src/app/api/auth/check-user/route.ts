@@ -1,4 +1,42 @@
 // app/api/auth/check-user/route.ts
+import { NextResponse } from "next/server"
+import { getRepository } from "@/lib/database"
+import { UsuarioEntity } from "@/entities"
+
+export async function POST(request: Request) {
+  try {
+    const { email } = await request.json()
+
+    if (!email) {
+      return NextResponse.json({ error: "Email es requerido" }, { status: 400 })
+    }
+
+    // Verificar si el usuario existe en la base de datos usando TypeORM
+    const usuarioRepo = await getRepository(UsuarioEntity)
+    const usuario = await usuarioRepo.findOne({
+      where: { email },
+      select: ["id", "email", "activo"], // Solo seleccionar campos necesarios
+    })
+
+    if (!usuario) {
+      return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 })
+    }
+
+    // Verificar si el usuario está activo
+    if (!usuario.activo) {
+      return NextResponse.json({ error: "Usuario inactivo" }, { status: 403 })
+    }
+
+    // Si el usuario existe y está activo, devolver éxito
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error("Error al verificar usuario:", error)
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 })
+  }
+}
+/*
+
+
 import { NextRequest, NextResponse } from 'next/server';
 import { UsuarioService } from '@/services';
 import { UsuarioRepository, PersonaRepository } from '@/repositories';
@@ -57,3 +95,4 @@ export async function POST(request: NextRequest) {
   }
 }
 
+*/

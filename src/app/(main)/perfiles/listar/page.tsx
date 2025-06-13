@@ -461,12 +461,12 @@ export default function ListarPerfilesPage() {
                             align="end"
                             style={{ backgroundColor: "#152A2A", borderColor: "#2A4A4A" }}
                           >
-                            <DropdownMenuItem
+                            {/*<DropdownMenuItem
                               onClick={() => router.push(`/perfiles/ver/${perfil.id}`)}
                               className="text-gray-300 hover:bg-gray-700 focus:bg-gray-700 focus:text-white"
                             >
-                              <Eye className="mr-2 h-4 w-4" /> Ver Detalles
-                            </DropdownMenuItem>
+                               <Eye className="mr-2 h-4 w-4" /> Ver Detalles 
+                            </DropdownMenuItem>*/}
                             {perfilActionPermissions.canEdit && (
                               <DropdownMenuItem
                                 onClick={() => handleEdit(perfil.id)}

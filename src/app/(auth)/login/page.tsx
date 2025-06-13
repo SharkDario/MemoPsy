@@ -75,7 +75,7 @@ export default function LoginPage() {
       const resetUrl = `${window.location.origin}/reset-password?email=${encodeURIComponent(email)}&timestamp=${resetTimestamp}&expires=${expirationTime}`;
 
       const formData = new FormData();
-      formData.append('access_key', 'myaccesskey8'); // Reemplaza con tu access key real
+      formData.append('access_key', 'b4588913-df5b-4c31-95f4-eb68d01cdf80'); // Reemplaza con tu access key real
       formData.append('subject', 'MemoPsy - Recuperación de Contraseña');
       formData.append('from_name', 'MemoPsy - Sistema de Autenticación');
       formData.append('email', email);
@@ -122,6 +122,61 @@ export default function LoginPage() {
       setIsResetting(false);
     }
   };
+
+
+/*
+  const handlePasswordReset = async () => {
+    if (!email) {
+      setError('Por favor, ingresa tu email para recuperar la contraseña.');
+      return;
+    }
+
+    setIsResetting(true);
+    setError(null);
+
+    try {
+      // Verifica si el usuario existe
+      const checkUserResponse = await fetch('/api/auth/check-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      if (!checkUserResponse.ok) {
+        throw new Error('Usuario no encontrado');
+      }
+
+      const resetTimestamp = Date.now();
+      const expirationTime = resetTimestamp + (60 * 60 * 1000); // 1 hora
+
+      const resetUrl = `${window.location.origin}/reset-password?email=${encodeURIComponent(email)}&timestamp=${resetTimestamp}&expires=${expirationTime}`;
+
+      // Enviar al backend que se encargue del correo
+      const response = await fetch('/api/auth/send-reset-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, resetUrl })
+      });
+
+      if (response.ok) {
+        setResetEmailSent(true);
+      } else {
+        throw new Error('Error al enviar el correo');
+      }
+
+    } catch (err) {
+      console.error("Password reset error:", err);
+      if (err instanceof Error && err.message === 'Usuario no encontrado') {
+        setError('No se encontró una cuenta con ese email.');
+      } else {
+        setError('Error al enviar el correo de recuperación. Inténtalo de nuevo.');
+      }
+    } finally {
+      setIsResetting(false);
+    }
+  };
+*/
+    
 
   if (resetEmailSent) {
     return (
