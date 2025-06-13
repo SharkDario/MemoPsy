@@ -1,4 +1,5 @@
 //src/app/(main)/informes/editar/[id]/page.tsx
+//src/app/(main)/informes/editar/[id]/page.tsx
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -122,10 +123,14 @@ export default function EditarInformePage() {
       const response = await fetch(`/api/pacientes/buscar?q=${encodeURIComponent(query)}&limit=5`);
       if (!response.ok) throw new Error('Error buscando pacientes');
       const data = await response.json();
-      setPacienteSearchResults((data.data || data).map((p: any) => ({
-        ...p,
-        nombreCompleto: `${p.persona.nombre} ${p.persona.apellido}`
-      })));
+      const results = (data.data || data).map((p: any) => ({ // Use 'any' if structure is not strictly Paciente yet
+          id: p.id,
+          nombre: p.persona.nombre,
+          apellido: p.persona.apellido,
+          dni: p.persona.dni,
+          nombreCompleto: `${p.persona.nombre} ${p.persona.apellido}` 
+      }));
+      setPacienteSearchResults(results);
     } catch (error) { console.error("Error fetching patients:", error); setPacienteSearchResults([]); } 
     finally { setIsPacienteSearchLoading(false); }
   };
@@ -167,7 +172,7 @@ export default function EditarInformePage() {
                     contenido: data.contenido,
                     esPrivado: data.esPrivado,
                     //pacientesIds: data.pacientes.map(p => p.id),
-                    pacientesIds: data.pacientes.map(p => String(p.id)), // Ensure p.id is a string
+                    pacientesIds: data.pacientes.map(p => String(p.id)) // Ensure p.id is a string
                 });
                 setInitialInformeTitle(data.titulo);
                 setSelectedPacientes(data.pacientes.map(p => ({...p, nombreCompleto: `${p.nombre} ${p.apellido}`})));
@@ -264,7 +269,7 @@ export default function EditarInformePage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#152A2A' }}>
-      {/* Navbar */}
+   
       <nav className="w-full p-4" style={{ backgroundColor: '#1D3434' }}>
         <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4"><div className="w-10 h-10"><MemopsyLogo /></div><h1 className="text-xl font-bold" style={{ color: '#F1C77A' }}>MemoPsy</h1></div>
@@ -279,7 +284,7 @@ export default function EditarInformePage() {
         )}
       </nav>
 
-      {/* Main Content */}
+      
       <main className="container mx-auto px-4 py-8">
         {pageError ? (
             <div className="text-center p-8 rounded-2xl max-w-md mx-auto" style={{ backgroundColor: '#1D3434' }}>

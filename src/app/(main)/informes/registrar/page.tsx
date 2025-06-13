@@ -207,9 +207,9 @@ export default function RegistrarInformePage() {
       setFormData(prev => ({ ...prev, pacientesIds: newSelectedPacientes.map(p => p.id) }));
       if (formErrors.pacientesIds) setFormErrors(prev => ({ ...prev, pacientesIds: undefined }));
     }
-    // setPacienteSearchQuery(''); // Keep search query
-    // setPacienteSearchResults([]); // Keep search results visible
-    // setIsPacientePopoverOpen(false); // Keep popover open for further selections
+    setPacienteSearchQuery(''); // Keep search query
+    setPacienteSearchResults([]); // Keep search results visible
+    setIsPacientePopoverOpen(false); // Keep popover open for further selections
     
     // Optional: You might want to clear the search query if the user should perform a new search for each new patient.
     // If so, just keep setPacienteSearchQuery(''); and setPacienteSearchResults([]);
@@ -423,21 +423,39 @@ export default function RegistrarInformePage() {
                   </div>
 
                   {/* Search input + dropdown */}
-                  <div className="relative">
+                  <div className="relative" ref={popoverRef}>
                     <Input
                       id="pacienteSearch"
                       type="text"
                       placeholder="Buscar paciente por nombre, apellido o DNI..."
                       value={pacienteSearchQuery}
+                      //onChange={(e) => {
+                      //  setPacienteSearchQuery(e.target.value)
+                      //  if (!isPacientePopoverOpen && e.target.value.length > 1) {
+                      //    setIsPacientePopoverOpen(true)
+                      //  }
+                      //}}
                       onChange={(e) => {
-                        setPacienteSearchQuery(e.target.value)
-                        if (!isPacientePopoverOpen && e.target.value.length > 1) {
-                          setIsPacientePopoverOpen(true)
+                        setPacienteSearchQuery(e.target.value);
+                        if (e.target.value.length > 1) {
+                          setIsPacientePopoverOpen(true);
+                        } else {
+                          setIsPacientePopoverOpen(false);
                         }
+                        }}
+                        onFocus={() => {
+                          if (pacienteSearchQuery.length > 1) {
+                            setIsPacientePopoverOpen(true);
+                          }
+                        }}
+                        onBlur={() => {
+                          setTimeout(() => {
+                            setIsPacientePopoverOpen(false);
+                          }, 150);
                       }}
-                      onFocus={() => {
-                        if (pacienteSearchQuery.length > 1) setIsPacientePopoverOpen(true)
-                      }}
+                      //onFocus={() => {
+                      //  if (pacienteSearchQuery.length > 1) setIsPacientePopoverOpen(true)
+                      //}}
                       className="bg-transparent border-0 text-white placeholder:text-gray-400 focus:ring-0 focus:outline-none p-0 w-full"
                     />
 
